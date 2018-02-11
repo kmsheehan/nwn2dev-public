@@ -1,0 +1,11 @@
+add_library(nwnutillib
+        BufferParser
+        findfirst
+        NWNUtilLib
+        OsCompat
+        Precomp
+        ProjGlobalDefs
+        Ref
+        spec
+        VersionConstants
+)
