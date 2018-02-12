@@ -45,7 +45,7 @@ typedef double LONGLONG;
 #endif
 
 typedef void *PVOID;
-typedef PVOID HANDLE;
+typedef FILE *HANDLE;
 typedef HANDLE HKEY;
 
 typedef struct _GUID {

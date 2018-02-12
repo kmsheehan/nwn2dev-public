@@ -20,12 +20,13 @@ char * OsCompat::filename(const char *str) {
     char *result;
     char *last;
     char *tmpStr = const_cast<char *>(str);
-    if ((last = strrchr(tmpStr, '.')) != NULL ) {
-        if ((*last == '.') && (last == tmpStr))
+    if ((last = strrchr(tmpStr, '.')) != nullptr ) {
+        if ((*last == '.') && (last == tmpStr)) {
             return tmpStr;
-        else {
+        } else {
             result = (char*) malloc(_MAX_FNAME);
-            snprintf(result, sizeof result, "%.*s", (int)(last - tmpStr), tmpStr);
+            char *fname = strtok(tmpStr,".");
+            strncpy(result,fname,_MAX_FNAME);
             return result;
         }
     } else {
@@ -38,15 +39,15 @@ char * OsCompat::extname(const char *str) {
     char *last;
     char *tmpStr = const_cast<char *>(str);
 
-    if ((last = strrchr(tmpStr, '.')) != NULL) {
+    if ((last = strrchr(tmpStr, '.')) != nullptr) {
         if ((*last == '.') && (last == tmpStr))
             return "";
         else {
             result = (char*) malloc(_MAX_EXT);
-            snprintf(result, sizeof result, "%s", last + 1);
+            snprintf(result, _MAX_EXT, "%s", last + 1);
             return result;
         }
     } else {
-        return ""; // Empty/NULL string
+        return ""; // Empty/nullptr string
     }
 }

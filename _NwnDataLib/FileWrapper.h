@@ -32,7 +32,7 @@ public:
 		 HANDLE File = nullptr
 		)
 		: m_File( File ),
-		  m_View( NULL ),
+		  m_View( nullptr ),
 		  m_Offset( 0 ),
 		  m_Size( 0 ),
 		  m_ExternalView( false )
@@ -46,15 +46,15 @@ public:
 	~FileWrapper(
 		)
 	{
-		if ((m_View != NULL) && (!m_ExternalView))
+		if ((m_View != nullptr) && (!m_ExternalView))
 		{
 // TODO			UnmapViewOfFile( m_View );
 
-			m_View = NULL;
+			m_View = nullptr;
 		}
-		else if (m_View != NULL)
+		else if (m_View != nullptr)
 		{
-			m_View = NULL;
+			m_View = nullptr;
 		}
 	}
 
@@ -68,11 +68,11 @@ public:
 		m_File         = File;
 		m_ExternalView = false;
 
-		if (m_View != NULL)
+		if (m_View != nullptr)
 		{
 // TODO			UnmapViewOfFile( m_View );
 
-			m_View = NULL;
+			m_View = nullptr;
 		}
 
 		if ((m_File != nullptr) &&
@@ -82,13 +82,13 @@ public:
 
 // TODO			Section = CreateFileMapping(
 //				m_File,
-//				NULL,
+//				nullptr,
 //				PAGE_READONLY,
 //				0,
 //				0,
-//				NULL);
+//				nullptr);
 
-			if (Section != NULL)
+			if (Section != nullptr)
 			{
 				unsigned char * View;
 
@@ -100,7 +100,7 @@ public:
 //					0);
 //				CloseHandle( Section );
 
-				if (View != NULL)
+				if (View != nullptr)
 				{
 					m_Offset = GetFilePointer( );
 					m_Size   = GetFileSize( );
@@ -141,23 +141,16 @@ public:
 		if (Length == 0)
 			return;
 
-		if (m_View != NULL)
+		if (m_View != nullptr)
 		{
 			if ((m_Offset + Length < m_Offset) ||
 			    (m_Offset + Length > m_Size))
 			{
-#if defined(_WIN32) && defined(_WIN64)
-				StringCbPrintfA(
-					ExMsg,
-					sizeof( ExMsg ),
-					"ReadFile( %s ) failed.",
-					Description);
-#else
-				sprintf(
+				snprintf(
 						ExMsg,
+						sizeof( ExMsg ),
 						"ReadFile( %s ) failed.",
 						Description);
-#endif
 
 				throw std::runtime_error( ExMsg );
 			}
@@ -171,26 +164,26 @@ public:
 			return;
 		}
 
-// TODO		if (::ReadFile(
-//			m_File,
-//			Buffer,
-//			(DWORD) Length,
-//			&Transferred,
-//			NULL) && (Transferred == (DWORD) Length))
-//			return;
-
 #if defined(_WIN32) && defined(_WIN64)
-		StringCbPrintfA(
-			ExMsg,
-			sizeof( ExMsg ),
-			"ReadFile( %s ) failed.",
-			Description);
+		if (::ReadFile(
+			m_File,
+			Buffer,
+			(DWORD) Length,
+			&Transferred,
+			nullptr) && (Transferred == (DWORD) Length))
+			return;
 #else
-		sprintf(
+        size_t len = fread(Buffer,sizeof(char),Length,m_File);
+
+		if (len == Length)
+			return;
+#endif
+
+		snprintf(
 				ExMsg,
+				sizeof( ExMsg ),
 				"ReadFile( %s ) failed.",
 				Description);
-#endif
 		throw std::runtime_error( ExMsg );
 	}
 
@@ -210,22 +203,15 @@ public:
 		DWORD NewPtrLow;
 		char  ExMsg[ 64 ];
 
-		if (m_View != NULL)
+		if (m_View != nullptr)
 		{
 			if (Offset >= m_Size)
 			{
-#if defined(_WIN32) && defined(_WIN64)
-				StringCbPrintfA(
-					ExMsg,
-					sizeof( ExMsg ),
-					"SeekOffset( %s ) failed.",
-					Description);
-#else
-				sprintf(
+				snprintf(
 						ExMsg,
+						sizeof( ExMsg ),
 						"SeekOffset( %s ) failed.",
 						Description);
-#endif
 				throw std::runtime_error( ExMsg );
 			}
 
@@ -241,18 +227,11 @@ public:
 		if ((NewPtrLow == INVALID_SET_FILE_POINTER))
 // TODO			&& (GetLastError( ) != NO_ERROR))
 		{
-#if defined(_WIN32) && defined(_WIN64)
-			StringCbPrintfA(
-				ExMsg,
-				sizeof( ExMsg ),
-				"SeekOffset( %s ) failed.",
-				Description);
-#else
-			sprintf(
+			snprintf(
 					ExMsg,
+					sizeof( ExMsg ),
 					"SeekOffset( %s ) failed.",
 					Description);
-#endif
 			throw std::runtime_error( ExMsg );
 		}
 	}
@@ -262,20 +241,27 @@ public:
 	GetFileSize(
 		) const
 	{
-		ULONGLONG Size;
+		ULONGLONG Size = 0;
 		DWORD     SizeHigh;
 
-		if (m_View != NULL)
+		if (m_View != nullptr)
 			return m_Size;
 
-// TODO		Size = ::GetFileSize( m_File, &SizeHigh );
+#if defined(_WIN32) && defined(_WIN64)
+		Size = ::GetFileSize( m_File, &SizeHigh );
 
-// TODO		if ((Size == INVALID_FILE_SIZE) && (GetLastError( ) != NO_ERROR))
-//		{
-//			throw std::runtime_error( "GetFileSize failed" );
-//		}
-
-		return Size | ((ULONGLONG) SizeHigh) << 32;
+		if ((Size == INVALID_FILE_SIZE) && (GetLastError( ) != NO_ERROR))
+		{
+			throw std::runtime_error( "GetFileSize failed" );
+		}
+#else
+		if(m_File != nullptr) {
+			fseek(m_File, 0 , SEEK_END);
+			Size = ftell(m_File);
+			fseek(m_File, 0 , SEEK_SET);// needed for next read from beginning of file
+		}
+#endif
+		return Size; // | ((ULONGLONG) SizeHigh) << 32;
 	}
 
 	inline
@@ -285,7 +271,7 @@ public:
 	{
 		LARGE_INTEGER Fp;
 
-		if (m_View != NULL)
+		if (m_View != nullptr)
 			return m_Offset;
 
 		Fp.QuadPart = 0;

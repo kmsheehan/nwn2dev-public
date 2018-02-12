@@ -511,7 +511,7 @@ public:
 		if (l != 0)
 		{
 			for (size_t i = 0; i < l; i += 1)
-				ResRef.RefStr[ i ] = (char) tolower( Str[ i ] );
+				ResRef.RefStr[ i ] =  Str[ i ];
 		}
 
 		if (l < sizeof( ResRef ) )

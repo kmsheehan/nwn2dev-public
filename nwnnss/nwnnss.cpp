@@ -18,6 +18,8 @@ Abstract:
 #include <libgen.h>
 #include <unistd.h>
 #include <list>
+#include <fstream>
+#include <iostream>
 #include "../_NwnDataLib/TextOut.h"
 #include "../_NwnDataLib/ResourceManager.h"
 #include "../_NwnDataLib/NWScriptReader.h"
@@ -121,18 +123,18 @@ public:
 #else
 		StringCbVPrintfA(buf, sizeof( buf ), fmt, ap);
 #endif
-		DWORD n = (DWORD)strlen(buf);
+		//DWORD n = strlen(buf);
 
 		puts( buf );
 
-		if (g_Log != NULL)
+		if (g_Log != nullptr)
 		{
 			time_t      t;
 			struct tm * tm;
 
 			time( &t );
 
-			if ((tm = gmtime( &t )) != NULL)
+			if ((tm = gmtime( &t )) != nullptr)
 			{
 				fprintf(
 					g_Log,
@@ -310,8 +312,8 @@ Environment:
 				Status = RegQueryValueExA(
 					Key,
 					ValueNames[ i ],
-					NULL,
-					NULL,
+					nullptr,
+					nullptr,
 					(LPBYTE) NameBuffer,
 					&NameBufferSize);
 
@@ -319,7 +321,7 @@ Environment:
 					continue;
 
 				//
-				// Strip trailing null byte if it exists.
+				// Strip trailing nullptr byte if it exists.
 				//
 
 				if ((NameBufferSize > 0) &&
@@ -597,18 +599,23 @@ Environment:
 --*/
 {
 	FileWrapper FileWrap;
-	HANDLE      SrcFile;
+    HANDLE      SrcFile;
+
+#if defined(_WIN32) && defined(_WIN64)
+
 
 	FileContents.clear( );
 
-// TODO	SrcFile = CreateFileA(
-//		FileName.c_str( ),
-//		GENERIC_READ,
-//		FILE_SHARE_READ,
-//		NULL,
-//		OPEN_EXISTING,
-//		FILE_ATTRIBUTE_NORMAL,
-//		NULL);
+
+	SrcFile = CreateFileA(
+		FileName.c_str( ),
+		GENERIC_READ,
+		FILE_SHARE_READ,
+		nullptr,
+		OPEN_EXISTING,
+		FILE_ATTRIBUTE_NORMAL,
+		nullptr);
+
 
 	if (SrcFile == nullptr)
 		return false;
@@ -629,15 +636,45 @@ Environment:
 	}
 	catch (std::exception)
 	{
-// TODO		CloseHandle( SrcFile );
+		CloseHandle( SrcFile );
 		SrcFile = nullptr;
 		return false;
 	}
 
-// TODO	CloseHandle( SrcFile );
+	CloseHandle( SrcFile );
 	SrcFile = nullptr;
-	
+
 	return true;
+#else
+
+    SrcFile = fopen(FileName.c_str(),"r");
+
+    FileContents.clear( );
+
+    if (SrcFile == nullptr)
+        return false;
+
+    try {
+        FileWrap.SetFileHandle(SrcFile,true);
+        if ((size_t) FileWrap.GetFileSize( ) != 0)
+        {
+            FileContents.resize( (size_t) FileWrap.GetFileSize( ) );
+
+            FileWrap.ReadFile(
+                    &FileContents[ 0 ],
+                    FileContents.size( ),
+                    "LoadFileFromDisk File Contents");
+        }
+
+    } catch (std::exception){
+        fclose(SrcFile);
+        SrcFile = nullptr;
+        return false;
+    }
+    return true;
+
+
+#endif
 }
 
 bool
@@ -716,38 +753,42 @@ Environment:
     char *FileName;
     std::string Extension;
 
-    char *dirc = strdup(InFile.c_str());
-    char *filec = strdup(InFile.c_str());
+    char dirc[_MAX_DIR];
+    char filec[_MAX_FNAME];
+
+    strncpy(dirc, InFile.c_str(),_MAX_DIR);
+    strncpy(filec,InFile.c_str(),_MAX_FNAME);
 
     Dir = dirname(dirc);
     FileName = basename(filec);
-    Extension = OsCompat::getFileExt(FileName);
+    FileName = OsCompat::filename(FileName);
+    Extension = OsCompat::getFileExt(InFile.c_str());
+
+    printf(" --- File [%s] Ext [%s]\n",FileName,Extension.c_str());
 
 #endif
 
-	if (Extension[ 0 ] != '.') {
-        FileResType = NWN::ResINVALID;
-    } else {
+//	if (Extension[ 0 ] != '.') {
+//        FileResType = NWN::ResINVALID;
+//    } else {
 #if defined(_WIN32) && defined(_WIN64)
         FileResType = ResMan.ExtToResType(Extension + 1);
 #else
         FileResType = ResMan.ExtToResType(Extension.c_str());
 #endif
-    }
+//    }
 
 	FileResRef = ResMan.ResRef32FromStr( FileName );
 
-	//
+    printf(" --- File [%s]\n",FileResRef.RefStr);
+
+
+    //
 	// Load the file directly if we can, otherwise attempt it via the resource
 	// system.
 	//
 
-#if defined(_WIN32) && defined(_WIN64)
-	if (!_access( InFile.c_str( ), 00 ))
-#else
     if (!access( InFile.c_str( ), 00 ))
-
-#endif
     {
 		return LoadFileFromDisk( InFile, FileContents );
 	}
@@ -770,7 +811,7 @@ CompileSourceFile(
 	 bool VerifyCode,
 	 IDebugTextOut * TextOut,
 	 UINT32 CompilerFlags,
-	 const NWN::ResRef32 & InFile,
+	 const NWN::ResRef32 InFile,
 	 const std::vector< unsigned char > & InFileContents,
 	 const std::string & OutBaseFile
 	)
@@ -836,11 +877,17 @@ Environment:
 	std::string                    FileName;
 	FILE                         * f;
 
-	if (!Quiet)
+    char filec[_MAX_FNAME];
+
+    strncpy(filec,InFile.RefStr,_MAX_FNAME);
+
+    printf (" <<< Compiling [%s] [%s]\n", InFile.RefStr,filec);
+
+    if (!Quiet)
 	{
 		TextOut->WriteText(
-			"Compiling: %.32s.NSS\n",
-			InFile.RefStr);
+			"Compiling: %s\n",
+			filec);
 	}
 
 	//
@@ -849,7 +896,7 @@ Environment:
 
 	Result = Compiler.NscCompileScript(
 		InFile,
-		(!InFileContents.empty( )) ? &InFileContents[ 0 ] : NULL,
+		(!InFileContents.empty( )) ? &InFileContents[ 0 ] : nullptr,
 		InFileContents.size( ),
 		CompilerVersion,
 		Optimize,
@@ -898,7 +945,7 @@ Environment:
 
 	f = fopen( FileName.c_str( ), "wb" );
 
-	if (f == NULL)
+	if (f == nullptr)
 	{
 		TextOut->WriteText(
 			"Error: Unable to open output file \"%s\".\n",
@@ -930,7 +977,7 @@ Environment:
 
 		f = fopen( FileName.c_str( ), "wb" );
 
-		if (f == NULL)
+		if (f == nullptr)
 		{
 			TextOut->WriteText(
 				"Error: Failed to open debug symbols file \"%s\".\n",
@@ -1038,7 +1085,7 @@ Environment:
 //
 //			NWScriptAnalyzer ScriptAnalyzer(
 //				TextOut,
-//				(!ActionDefs.empty( )) ? &ActionDefs[ 0 ] : NULL,
+//				(!ActionDefs.empty( )) ? &ActionDefs[ 0 ] : nullptr,
 //				(NWSCRIPT_ACTION) ActionDefs.size( ));
 //
 //			ScriptAnalyzer.Analyze(
@@ -1198,7 +1245,7 @@ Environment:
 	//
 
 	Compiler.NscDisassembleScript(
-		(!InFileContents.empty( )) ? &InFileContents[ 0 ] : NULL,
+		(!InFileContents.empty( )) ? &InFileContents[ 0 ] : nullptr,
 		InFileContents.size( ),
 		Disassembly);
 
@@ -1207,7 +1254,7 @@ Environment:
 
 	f = fopen( FileName.c_str( ), "wt" );
 
-	if (f == NULL)
+	if (f == nullptr)
 	{
 		TextOut->WriteText(
 			"Error: Unable to open disassembly file \"%s\".\n",
@@ -1275,7 +1322,7 @@ Environment:
 //		if (!ReturnTypes.empty( ))
 //			ActionDef.ParameterTypes = &ReturnTypes[ 0 ];
 //		else
-//			ActionDef.ParameterTypes = NULL;
+//			ActionDef.ParameterTypes = nullptr;
 //
 //		ActionDefs.push_back( ActionDef );
 //	}
@@ -1294,7 +1341,7 @@ Environment:
 
 	f = fopen( FileName.c_str( ), "wb" );
 
-	if (f == NULL)
+	if (f == nullptr)
 	{
 		TextOut->WriteText(
 			"Error: Unable to open script temporary file \"%s\".\n",
@@ -1321,7 +1368,7 @@ Environment:
 
 	fclose( f );
 
-	f = NULL;
+	f = nullptr;
 
 	if (!DbgFileContents.empty( ))
 	{
@@ -1330,7 +1377,7 @@ Environment:
 
 		f = fopen( FileName.c_str( ), "wb" );
 
-		if (f == NULL)
+		if (f == nullptr)
 		{
 			TextOut->WriteText(
 				"Error: Unable to open symbols temporary file \"%s\".\n",
@@ -1358,7 +1405,7 @@ Environment:
 		SymbolsTempFile = FileName;
 	}
 
-	f = NULL;
+	f = nullptr;
 
 	//
 	// Generate unoptimized IR.
@@ -1382,7 +1429,7 @@ Environment:
 //
 //		f = fopen( FileName.c_str( ), "wt" );
 //
-//		if (f == NULL)
+//		if (f == nullptr)
 //		{
 //			TextOut->WriteText(
 //				"Error: Unable to open IR file \"%s\".\n",
@@ -1398,7 +1445,7 @@ Environment:
 //		WriteFileTextOut CaptureOut( f );
 //		NWScriptAnalyzer ScriptAnalyzer(
 //			&CaptureOut,
-//			(!ActionDefs.empty( )) ? &ActionDefs[ 0 ] : NULL,
+//			(!ActionDefs.empty( )) ? &ActionDefs[ 0 ] : nullptr,
 //			(NWSCRIPT_ACTION) ActionDefs.size( ));
 //
 //		ScriptAnalyzer.Analyze(
@@ -1408,16 +1455,16 @@ Environment:
 //		ScriptAnalyzer.DisplayIR( );
 //
 //		fclose( f );
-//		f = NULL;
+//		f = nullptr;
 //
 //	}
 //	catch (NWScriptAnalyzer::script_error &e)
 //	{
-//		if (f != NULL)
+//		if (f != nullptr)
 //		{
 //			fclose( f );
 //
-//			f = NULL;
+//			f = nullptr;
 //		}
 //
 //		TextOut->WriteText(
@@ -1432,11 +1479,11 @@ Environment:
 //	}
 //	catch (std::exception &e)
 //	{
-//		if (f != NULL)
+//		if (f != nullptr)
 //		{
 //			fclose( f );
 //
-//			f = NULL;
+//			f = nullptr;
 //		}
 //
 //		TextOut->WriteText(
@@ -1465,7 +1512,7 @@ Environment:
 //
 //		f = fopen( FileName.c_str( ), "wt" );
 //
-//		if (f == NULL)
+//		if (f == nullptr)
 //		{
 //			TextOut->WriteText(
 //				"Error: Unable to open IR file \"%s\".\n",
@@ -1481,7 +1528,7 @@ Environment:
 //		WriteFileTextOut CaptureOut( f );
 //		NWScriptAnalyzer ScriptAnalyzer(
 //			&CaptureOut,
-//			(!ActionDefs.empty( )) ? &ActionDefs[ 0 ] : NULL,
+//			(!ActionDefs.empty( )) ? &ActionDefs[ 0 ] : nullptr,
 //			(NWSCRIPT_ACTION) ActionDefs.size( ));
 //
 //		ScriptAnalyzer.Analyze(
@@ -1491,15 +1538,15 @@ Environment:
 //		ScriptAnalyzer.DisplayIR( );
 //
 //		fclose( f );
-//		f = NULL;
+//		f = nullptr;
 //	}
 //	catch (NWScriptAnalyzer::script_error &e)
 //	{
-//		if (f != NULL)
+//		if (f != nullptr)
 //		{
 //			fclose( f );
 //
-//			f = NULL;
+//			f = nullptr;
 //		}
 //
 //		TextOut->WriteText(
@@ -1514,11 +1561,11 @@ Environment:
 //	}
 //	catch (std::exception &e)
 //	{
-//		if (f != NULL)
+//		if (f != nullptr)
 //		{
 //			fclose( f );
 //
-//			f = NULL;
+//			f = nullptr;
 //		}
 //
 //		TextOut->WriteText(
@@ -1615,6 +1662,8 @@ Environment:
 	// Pull in the input file first.
 	//
 
+    printf(">>> Filename %s\n",InFile.c_str());
+
 	if (!LoadInputFile(
 		ResMan,
 		TextOut,
@@ -1629,7 +1678,9 @@ Environment:
 		return false;
 	}
 
-	//
+    printf(">>> Filename [%s] [%s]\n",InFile.c_str(),FileResRef.RefStr);
+
+    //
 	// Now execute the main operation.
 	//
 
@@ -1648,7 +1699,7 @@ Environment:
 			FileResRef,
 			InFileContents,
 			OutBaseFile);
-			
+
 	}
 	else
 	{
@@ -1755,7 +1806,7 @@ Arguments:
 	TextOut - Supplies the text out interface used to receive any diagnostics
 	          issued.
 
-	CompilerFlags - Supplies compiler control flags.  Legal values are drawn 
+	CompilerFlags - Supplies compiler control flags.  Legal values are drawn
 	                from the NscCompilerFlags enumeration.
 
 	InFile - Supplies the path to the input file.  This may end in a wildcard.
@@ -1781,7 +1832,7 @@ Environment:
 	std::string            WildcardRoot;
 	std::string            MatchedFile;
 	std::string            OutFile;
-	std::string::size_type Offs; 
+	std::string::size_type Offs;
 	bool                   Status;
 	bool                   ThisStatus;
 	unsigned long          Errors;
@@ -1947,7 +1998,7 @@ Environment:
 {
 	FILE * f;
 
-	f = NULL;
+	f = nullptr;
 
 	try
 	{
@@ -1955,7 +2006,7 @@ Environment:
 
 		f = fopen( ResponseFileName, "rt" );
 
-		if (f == NULL)
+		if (f == nullptr)
 			throw std::runtime_error( "Failed to open response file." );
 
 		//
@@ -1997,10 +2048,10 @@ Environment:
 	}
 	catch (std::exception &e)
 	{
-		if (f != NULL)
+		if (f != nullptr)
 		{
 			fclose( f );
-			f = NULL;
+			f = nullptr;
 		}
 
 		printf(
@@ -2160,8 +2211,8 @@ Environment:
 
 					case 'i':
 						{
-							char     * Token     = NULL;
-							char     * NextToken = NULL;
+							char     * Token     = nullptr;
+							char     * NextToken = nullptr;
 							std::string   Ansi;
 
 							if (i + 1 >= argc)
@@ -2172,8 +2223,8 @@ Environment:
 							}
 
 							for (Token = strtok_r( argv[ i + 1 ], ";", &NextToken );
-								  Token != NULL;
-								  Token = strtok_r( NULL, ";", &NextToken ))
+								  Token != nullptr;
+								  Token = strtok_r( nullptr, ";", &NextToken ))
 							{
 								SearchPaths.push_back( Token );
 							}
@@ -2395,7 +2446,7 @@ Environment:
 			//
 			// If we just finished parsing the response file arguments, then we
 			// are done.
-			// 
+			//
 
 			if (argv[ 0 ] == ResponseFileArgs[ 0 ])
 				break;
@@ -2435,12 +2486,12 @@ Environment:
 			"                  infile [outfile|infiles]\n"
 			"  batchoutdir - Supplies the location at which batch mode places\n"
 			"                output files and enables multiple input filenames.\n"
-			"  homedir - Per-user NWN2 home directory (i.e. Documents\\NWN2).\n"
+			"  homedir - Per-user NWN home directory (i.e. Documents\\Neverwinter Nights).\n"
 			"  pathspec - Semicolon separated list of directories to search for\n"
 			"             additional includes.\n"
 			"  resref - Resource name of module to load (without extension).\n"
 			"           Note that loading a module is potentially slow.\n"
-			"  installdir - Per-machine NWN2 install directory.\n"
+			"  installdir - NWN install directory.\n"
 			"  modpath - Supplies the full path to the .mod (or directory) that\n"
 			"            contains the module.ifo for the module to load.  This\n"
 			"            option overrides the [-r resref] option.\n"
@@ -2483,10 +2534,10 @@ Environment:
 			"Failed to initialize resource manager: '%s'\n",
 			e.what( ) );
 
-		if (g_Log != NULL)
+		if (g_Log != nullptr)
 		{
 			fclose( g_Log );
-			g_Log = NULL;
+			g_Log = nullptr;
 		}
 
 		return 0;
@@ -2607,13 +2658,13 @@ Environment:
 
 				if (_splitpath_s(
 					it->c_str( ),
-					NULL,
+					nullptr,
 					0,
-					NULL,
+					nullptr,
 					0,
 					FileName,
 					_MAX_FNAME,
-					NULL,
+					nullptr,
 					0))
 				{
 					g_TextOut.WriteText(
@@ -2626,7 +2677,7 @@ Environment:
 #else
                 char *FileName = OsCompat::filename(it->c_str( ));
 #endif
-					
+
 				ThisOutFile  = BatchOutDir;
 				ThisOutFile += FileName;
 			}
@@ -2677,10 +2728,10 @@ Environment:
 	if (Errors > 1)
 		g_TextOut.WriteText( "%lu error(s) processing input files.\n", Errors );
 
-	if (g_Log != NULL)
+	if (g_Log != nullptr)
 	{
 		fclose( g_Log );
-		g_Log = NULL;
+		g_Log = nullptr;
 	}
 
 	//
@@ -2688,7 +2739,7 @@ Environment:
 	//
 
 	delete g_ResMan;
-	g_ResMan = NULL;
+	g_ResMan = nullptr;
 
 	return ReturnCode;
 }
