@@ -70,20 +70,17 @@ Environment:
 		FILE_ATTRIBUTE_NORMAL,
 		NULL);
 #else
-    // TODO
+	File = fopen(NcsFileName,"r");
 #endif
 
 	if (File == nullptr)
 	{
-#if defined(_WIN32) && defined(_WIN64)
-		StringCbPrintfA(
+		snprintf(
 			ErrorMsg,
 			sizeof( ErrorMsg ),
 			"Error opening NCS file '%s'.",
 			NcsFileName);
-#else
-		// TODO
-#endif
+
 		throw std::runtime_error( ErrorMsg );
 	}
 
@@ -97,19 +94,11 @@ Environment:
 
 		if (FileSize < sizeof( Header ))
 		{
-#if defined(_WIN32) && defined(_WIN64)
-			StringCbPrintfA(
-				ErrorMsg,
-				sizeof( ErrorMsg ),
-				"Too short header in NCS file '%s'.",
-				NcsFileName);
-#else
 			snprintf(
 					ErrorMsg,
 					sizeof( ErrorMsg ),
 					"Too short header in NCS file '%s'.",
 					NcsFileName);
-#endif
 			throw std::runtime_error( ErrorMsg );
 		}
 
@@ -117,37 +106,21 @@ Environment:
 
 		if (Header.TOpCode != 0x42)
 		{
-#if defined(_WIN32) && defined(_WIN64)
-			StringCbPrintfA(
-				ErrorMsg,
-				sizeof( ErrorMsg ),
-				"Invalid T opcode in NCS file '%s'.",
-				NcsFileName);
-#else
 			snprintf(
 					ErrorMsg,
 					sizeof( ErrorMsg ),
 					"Invalid T opcode in NCS file '%s'.",
 					NcsFileName);
-#endif
 			throw std::runtime_error( ErrorMsg );
 		}
 
 		if (FileSize != bswap_32( Header.FileSize ))
 		{
-#if defined(_WIN32) && defined(_WIN64)
-			StringCbPrintfA(
-				ErrorMsg,
-				sizeof( ErrorMsg ),
-				"Invalid opcode T size operand in NCS file '%s'.",
-				NcsFileName);
-#else
 			snprintf(
 					ErrorMsg,
 					sizeof( ErrorMsg ),
 					"Invalid opcode T size operand in NCS file '%s'.",
 					NcsFileName);
-#endif
 			throw std::runtime_error( ErrorMsg );
 		}
 
@@ -167,13 +140,21 @@ Environment:
 	}
 	catch (...)
 	{
-// TODO		CloseHandle( File );
+#if defined(_WIN32) && defined(_WIN64)
+		CloseHandle( File );
+#else
+        fclose(File);
+#endif
 		File = nullptr;
 
 		throw;
 	}
 
-// TODO	CloseHandle( File );
+#if defined(_WIN32) && defined(_WIN64)
+	CloseHandle( File );
+#else
+    fclose(File);
+#endif
 	File = nullptr;
 }
 

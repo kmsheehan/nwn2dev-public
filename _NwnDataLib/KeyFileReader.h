@@ -22,6 +22,7 @@ Abstract:
 
 #include "ResourceAccessor.h"
 #include "FileWrapper.h"
+#include "../_NwnUtilLib/NWNUtilLib.h"
 
 template< typename ResRefT > class BifFileReader;
 

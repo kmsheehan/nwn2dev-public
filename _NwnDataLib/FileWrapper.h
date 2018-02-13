@@ -18,6 +18,10 @@ Abstract:
 
 #include "../_NwnUtilLib/OsCompat.h"
 
+#if !defined(_WIN32) && !defined(_WIN64)
+#include <sys/mman.h>
+#endif
+
 #ifdef _MSC_VER
 #pragma once
 #endif
@@ -48,7 +52,11 @@ public:
 	{
 		if ((m_View != nullptr) && (!m_ExternalView))
 		{
-// TODO			UnmapViewOfFile( m_View );
+#if defined(_WIN32) && defined(_WIN64)
+			UnmapViewOfFile( m_View );
+#else
+            munmap(m_View,m_Size);
+#endif
 
 			m_View = nullptr;
 		}
@@ -70,8 +78,11 @@ public:
 
 		if (m_View != nullptr)
 		{
-// TODO			UnmapViewOfFile( m_View );
-
+#if defined(_WIN32) && defined(_WIN64)
+			UnmapViewOfFile( m_View );
+#else
+			munmap(m_View,m_Size);
+#endif
 			m_View = nullptr;
 		}
 
@@ -79,26 +90,26 @@ public:
 		    (AsSection))
 		{
 			HANDLE Section;
+			unsigned char * View;
 
-// TODO			Section = CreateFileMapping(
-//				m_File,
-//				nullptr,
-//				PAGE_READONLY,
-//				0,
-//				0,
-//				nullptr);
+#if defined(_WIN32) && defined(_WIN64)
+			Section = CreateFileMapping(
+				m_File,
+				nullptr,
+				PAGE_READONLY,
+				0,
+				0,
+				nullptr);
 
 			if (Section != nullptr)
 			{
-				unsigned char * View;
-
-// TODO				View = (unsigned char *) MapViewOfFile(
-//					Section,
-//					FILE_MAP_READ,
-//					0,
-//					0,
-//					0);
-//				CloseHandle( Section );
+				View = (unsigned char *) MapViewOfFile(
+				Section,
+				FILE_MAP_READ,
+				0,
+				0,
+				0);
+				CloseHandle( Section );
 
 				if (View != nullptr)
 				{
@@ -107,21 +118,36 @@ public:
 					m_View   = View;
 				}
 			}
+
+#else
+			fseek(m_File, 0 , SEEK_END);
+			m_Size = ftell(m_File);
+			fseek(m_File, 0 , SEEK_SET);// needed for next read from beginning of file
+
+			View = static_cast<unsigned char *>(mmap(0, m_Size, PROT_READ, MAP_SHARED, reinterpret_cast<int>(File), 0));
+
+			if (View != nullptr)
+			{
+				m_Offset = GetFilePointer( );
+				m_Size   = GetFileSize( );
+				m_View   = View;
+			}
+#endif
 		}
 	}
 
-	inline
-	void
-	SetExternalView(
-		 const unsigned char * View,
-		 ULONGLONG ViewSize
-		)
-	{
-		m_Offset       = 0;
-		m_Size         = ViewSize;
-		m_View         = (unsigned char *) View; // Still const
-		m_ExternalView = true;
-	}
+//	inline
+//	void
+//	SetExternalView(
+//		 const unsigned char * View,
+//		 ULONGLONG ViewSize
+//		)
+//	{
+//		m_Offset       = 0;
+//		m_Size         = ViewSize;
+//		m_View         = (unsigned char *) View; // Still const
+//		m_ExternalView = true;
+//	}
 
 	//
 	// ReadFile wrapper with descriptive exception raising on failure.
@@ -222,10 +248,13 @@ public:
 		Low  = (LONG) ((Offset >>  0) & 0xFFFFFFFF);
 		High = (LONG) ((Offset >> 32) & 0xFFFFFFFF);
 
-// TODO		NewPtrLow = SetFilePointer( m_File, Low, &High, FILE_BEGIN );
+#if defined(_WIN32) && defined(_WIN64)
+		NewPtrLow = SetFilePointer( m_File, Low, &High, FILE_BEGIN );
+#else
+        NewPtrLow = lseek(reinterpret_cast<int>(m_File), Offset, SEEK_SET);
+#endif
 
 		if ((NewPtrLow == INVALID_SET_FILE_POINTER))
-// TODO			&& (GetLastError( ) != NO_ERROR))
 		{
 			snprintf(
 					ExMsg,
@@ -265,7 +294,7 @@ public:
 	}
 
 	inline
-	ULONGLONG
+	LONGLONG
 	GetFilePointer(
 		) const
 	{
@@ -276,10 +305,15 @@ public:
 
 		Fp.QuadPart = 0;
 
-// TODO		if (!SetFilePointerEx( m_File, Fp, &Fp, FILE_CURRENT ))
-//			throw std::runtime_error( "SetFilePointerEx failed" );
+#if defined(_WIN32) && defined(_WIN64)
+		if (!SetFilePointerEx( m_File, Fp, &Fp, FILE_CURRENT ))
+			throw std::runtime_error( "SetFilePointerEx failed" );
 
+#else
+        Fp.QuadPart = lseek(reinterpret_cast<int>(m_File), 0, SEEK_CUR ) ;
+#endif
 		return Fp.QuadPart;
+
 	}
 
 private:

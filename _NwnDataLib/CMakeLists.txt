@@ -1,8 +1,6 @@
 add_library(nwndatalib
         BifFileReader
         FileWrapper
-        GffFileReader
-        GffInternal
         KeyFileReader
         NWNDataLib
         NWScriptReader

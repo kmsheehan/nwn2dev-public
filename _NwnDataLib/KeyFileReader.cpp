@@ -52,9 +52,10 @@ Environment:
 --*/
 : m_KeyFileName( FileName )
 {
+    HANDLE        File;
+    unsigned long FileSize;
+
 #if defined(_WIN32) && defined(_WIN64)
-	HANDLE        File;
-	unsigned long FileSize;
 
 	File = CreateFileA(
 		FileName.c_str( ),
@@ -102,6 +103,32 @@ Environment:
 	C_ASSERT( sizeof( KEY_FILE ) == 12 );
 	C_ASSERT( sizeof( KEY_RESOURCE ) == 6 + sizeof( ResRefT ) );
 #else
+
+    File = fopen(FileName.c_str(),"r");
+
+    if (File == nullptr)
+        throw std::runtime_error( "Failed to open KEY file." );
+
+    try
+    {
+        fseek(File, 0 , SEEK_END);
+        FileSize = ftell(File);
+        fseek(File, 0 , SEEK_SET);// needed for next read from beginning of file
+
+
+        if ((FileSize == 0xFFFFFFFF))
+            throw std::runtime_error( "Failed to read file size." );
+
+        ParseKeyFile( File, InstallDir );
+    }
+    catch (...)
+    {
+        fclose( File );
+
+        throw;
+    }
+
+    fclose( File );
 #endif
 }
 

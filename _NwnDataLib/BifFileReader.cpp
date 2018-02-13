@@ -14,7 +14,6 @@ Abstract:
 --*/
 
 #include "Precomp.h"
-//#include "../NWNBaseLib/NWNBaseLib.h"
 #include "BifFileReader.h"
 
 template< typename ResRefT >
@@ -139,8 +138,12 @@ Environment:
 {
 	if (m_File != nullptr)
 	{
-// TODO		CloseHandle( m_File );
 
+#if defined(_WIN32) && defined(_WIN64)
+		CloseHandle( m_File );
+#else
+		fclose(m_File);
+#endif
 		m_File = nullptr;
 	}
 }

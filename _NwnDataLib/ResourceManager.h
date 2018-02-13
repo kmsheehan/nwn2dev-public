@@ -20,9 +20,12 @@ Abstract:
 #pragma once
 #endif
 
+#include <unordered_map>
+#include <map>
 #include "ResourceAccessor.h"
-#include "GffFileReader.h"
+//#include "GffFileReader.h"
 #include "KeyFileReader.h"
+#include "../_NwnUtilLib/NWNUtilLib.h"
 
 
 struct IDebugTextOut;
@@ -312,19 +315,19 @@ public:
 //	size_t
 //	CloseOpenResourceFileHandles(
 //		);
-
-	//
-	// Change the temporary directory for the resource manager.  This routine
-	// should only be called before the resource manager has loaded any data
-	// resources.
-	//
-
-	void
-	ChangeTemporaryDirectory(
-		 const std::string & TempDirectory
-		);
-
-
+//
+//	//
+//	// Change the temporary directory for the resource manager.  This routine
+//	// should only be called before the resource manager has loaded any data
+//	// resources.
+//	//
+//
+//	void
+//	ChangeTemporaryDirectory(
+//		 const std::string & TempDirectory
+//		);
+//
+//
 //	//
 //	// Demand load a resource by resref.  The routine copies the entire
 //	// resource to a disk file (which may be the original file for a directory

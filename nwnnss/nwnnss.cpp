@@ -22,10 +22,8 @@ Abstract:
 #include <iostream>
 #include "../_NwnDataLib/TextOut.h"
 #include "../_NwnDataLib/ResourceManager.h"
-#include "../_NwnDataLib/NWScriptReader.h"
+//#include "../_NwnDataLib/NWScriptReader.h"
 #include "../_NscLib/Nsc.h"
-//#include "../_NwnBaseLib/BaseTypes.h"
-//#include "../_NwnScriptLib/NWScriptInterfaces.h"
 #include "../_NwnUtilLib/findfirst.h"
 
 typedef std::vector< std::string > StringVec;

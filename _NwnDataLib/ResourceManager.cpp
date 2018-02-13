@@ -86,13 +86,13 @@ Environment:
   m_NextFileHandle( 0 ),
   m_ResManFlags( 0 )
 {
-	CHAR TempPath[ _MAX_PATH + 1 ];
-	CHAR TempUnique[ 32 ];
-
-	if (CreateFlags & ResManCreateFlagNoInstanceSetup)
-		return;
-
-// TODO	
+//	CHAR TempPath[ _MAX_PATH + 1 ];
+//	CHAR TempUnique[ 32 ];
+//
+//	if (CreateFlags & ResManCreateFlagNoInstanceSetup)
+//		return;
+//
+//
 //   	if (!GetTempPathA( _MAX_PATH, TempPath ))
 //		TempPath[ 0 ] = '\0';
 //
@@ -101,21 +101,21 @@ Environment:
 //		sizeof( TempUnique ),
 //		"NWN2CliExt_%lu",
 //		GetCurrentProcessId( ) );
-
-	m_TempUnique = TempUnique;
-
-	//
-	// A named event is used to communicate to other instances that they should
-	// not clean up our temp directory.
-	//
-
-// TODO	m_InstanceEvent = CreateEventA( nullptr, true, false, TempUnique );
-
-	//
-	// Prepare the temporary storage path for use.
-	//
-
-	ChangeTemporaryDirectory( TempPath );
+//
+//	m_TempUnique = TempUnique;
+//
+//	//
+//	// A named event is used to communicate to other instances that they should
+//	// not clean up our temp directory.
+//	//
+//
+//	m_InstanceEvent = CreateEventA( nullptr, true, false, TempUnique );
+//
+//	//
+//	// Prepare the temporary storage path for use.
+//	//
+//
+//	ChangeTemporaryDirectory( TempPath );
 }
 
 ResourceManager::~ResourceManager(
@@ -140,15 +140,15 @@ Environment:
 
 --*/
 {
-	//CleanDemandLoadedFiles( );
-
-// TODO	RemoveDirectoryA( m_TempPath.c_str( ) );
-
-	if (m_InstanceEvent != nullptr)
-	{
-// TODO		CloseHandle( m_InstanceEvent );
-		m_InstanceEvent = nullptr;
-	}
+//	//CleanDemandLoadedFiles( );
+//
+//	RemoveDirectoryA( m_TempPath.c_str( ) );
+//
+//	if (m_InstanceEvent != nullptr)
+//	{
+//		CloseHandle( m_InstanceEvent );
+//		m_InstanceEvent = nullptr;
+//	}
 }
 
 //void
@@ -305,61 +305,61 @@ Environment:
 //	return ForceCloseOpenFileHandles( );
 //}
 
-void
-ResourceManager::ChangeTemporaryDirectory(
-	 const std::string & TempDirectory
-	)
-/*++
-
-Routine Description:
-
-	This routine sets the temporary storage location for the resource manager.
-	If there were any previous data items in the temporary storage location,
-	they are removed.
-
-	The caller bears responsibility for only invoking this routine prior to the
-	resource manager having loaded any data resources, as the resource temp
-	path being invalidated and no attempt is made to update opened resource
-	files.
-
-Arguments:
-
-	TempDirectory - Supplies the directory to store temporary data in.  The
-	                resource manager uses a uniquely named subdirectory to
-	                hold any temporary files.  Any previous instances that are
-	                now defunct under this path are also cleaned up.
-
-Return Value:
-
-	The routine raises an std::exception on failure.
-
-Environment:
-
-	User mode.
-
---*/
-{
-// TODO	if (!TempDirectory.empty( ))
+//void
+//ResourceManager::ChangeTemporaryDirectory(
+//	 const std::string & TempDirectory
+//	)
+///*++
+//
+//Routine Description:
+//
+//	This routine sets the temporary storage location for the resource manager.
+//	If there were any previous data items in the temporary storage location,
+//	they are removed.
+//
+//	The caller bears responsibility for only invoking this routine prior to the
+//	resource manager having loaded any data resources, as the resource temp
+//	path being invalidated and no attempt is made to update opened resource
+//	files.
+//
+//Arguments:
+//
+//	TempDirectory - Supplies the directory to store temporary data in.  The
+//	                resource manager uses a uniquely named subdirectory to
+//	                hold any temporary files.  Any previous instances that are
+//	                now defunct under this path are also cleaned up.
+//
+//Return Value:
+//
+//	The routine raises an std::exception on failure.
+//
+//Environment:
+//
+//	User mode.
+//
+//--*/
+//{
+//	if (!TempDirectory.empty( ))
 //		CreateDirectoryA( TempDirectory.c_str( ), nullptr );
-
-	m_TempPath  = TempDirectory;
-	m_TempPath += m_TempUnique;
-	m_TempPath += "\\";
-
-	//
-	// A previous instance might have had the same path as us, so delete it.
-	//
-
-	//DeleteDirectoryFiles( m_TempPath.c_str( ) );
-
-	//CleanOldTempFiles( TempDirectory.c_str( ) );
-
-	//
-	// Initialize the temp directory.
-	//
-
-// TODO	CreateDirectoryA( m_TempPath.c_str( ), nullptr );
-}
+//
+//	m_TempPath  = TempDirectory;
+//	m_TempPath += m_TempUnique;
+//	m_TempPath += "\\";
+//
+//	//
+//	// A previous instance might have had the same path as us, so delete it.
+//	//
+//
+//	//DeleteDirectoryFiles( m_TempPath.c_str( ) );
+//
+//	//CleanOldTempFiles( TempDirectory.c_str( ) );
+//
+//	//
+//	// Initialize the temp directory.
+//	//
+//
+//	CreateDirectoryA( m_TempPath.c_str( ), nullptr );
+//}
 
 //std::string
 //ResourceManager::Demand(
@@ -488,9 +488,9 @@ Environment:
 //			// reverse order.
 //			//
 //
-//// TODO			DirIndex = m_DirFiles.size( ) - Entry->TierIndex;
+//			DirIndex = m_DirFiles.size( ) - Entry->TierIndex;
 //
-//// TODO			ResPath  = m_DirFiles[ DirIndex ]->GetRealFileName(Entry->FileIndex );
+//			ResPath  = m_DirFiles[ DirIndex ]->GetRealFileName(Entry->FileIndex );
 //
 //			//
 //			// Add the file to the quick lookup list.
@@ -548,14 +548,14 @@ Environment:
 //			// Open the temp file.
 //			//
 //
-//// TODO			ResFile = CreateFileA(
-////				ResPath.c_str( ),
-////				GENERIC_WRITE,
-////				FILE_SHARE_WRITE,
-////				nullptr,
-////				CREATE_ALWAYS,
-////				FILE_ATTRIBUTE_TEMPORARY,
-////				nullptr);
+//			ResFile = CreateFileA(
+//				ResPath.c_str( ),
+//				GENERIC_WRITE,
+//				FILE_SHARE_WRITE,
+//				nullptr,
+//				CREATE_ALWAYS,
+//				FILE_ATTRIBUTE_TEMPORARY,
+//				nullptr);
 //
 //			if (ResFile == nullptr)
 //			{
@@ -585,15 +585,15 @@ Environment:
 //			// the file system.
 //			//
 //
-//// TODO			if (SetFilePointer(
-////				ResFile,
-////				(LONG) (FileSize & 0xFFFFFFFF),
-////				&DistHigh,
-////				FILE_BEGIN ))
-////			{
-////				SetEndOfFile( ResFile );
-////				SetFilePointer( ResFile, 0, nullptr, FILE_BEGIN );
-////			}
+//			if (SetFilePointer(
+//				ResFile,
+//				(LONG) (FileSize & 0xFFFFFFFF),
+//				&DistHigh,
+//				FILE_BEGIN ))
+//			{
+//				SetEndOfFile( ResFile );
+//				SetFilePointer( ResFile, 0, nullptr, FILE_BEGIN );
+//			}
 //
 //			BytesLeft = FileSize;
 //			Offset    = 0;
@@ -617,15 +617,15 @@ Environment:
 //						"ReadEncapsulatedFile failed" );
 //				}
 //
-//// TODO				if (!WriteFile(
-////					ResFile,
-////					Buffer,
-////					(DWORD) Read,
-////					&Written,
-////					nullptr))
-////				{
-////					throw std::runtime_error( "WriteFile failed" );
-////				}
+//				if (!WriteFile(
+//					ResFile,
+//					Buffer,
+//					(DWORD) Read,
+//					&Written,
+//					nullptr))
+//				{
+//					throw std::runtime_error( "WriteFile failed" );
+//				}
 //
 //				if (Written != (DWORD) Read)
 //					throw std::runtime_error( "Short write" );
@@ -646,11 +646,11 @@ Environment:
 //			if (Handle != INVALID_FILE)
 //				Entry->Accessor->CloseFile( Handle );
 //
-//// TODO			if (ResFile != nullptr)
-////				CloseHandle( ResFile );
+//			if (ResFile != nullptr)
+//				CloseHandle( ResFile );
 //
-//// TODO			if (!ResPath.empty( ))
-////				DeleteFileA( ResPath.c_str( ) );
+//			if (!ResPath.empty( ))
+//				DeleteFileA( ResPath.c_str( ) );
 //
 //			m_TextWriter->WriteText(
 //				"WARNING: Exception '%s' loading resource '%s' (type %04X).\n",
@@ -665,11 +665,11 @@ Environment:
 //			if (Handle != INVALID_FILE)
 //				Entry->Accessor->CloseFile( Handle );
 //
-//// TODO			if (ResFile != nullptr)
-////				CloseHandle( ResFile );
+//			if (ResFile != nullptr)
+//				CloseHandle( ResFile );
 //
-//// TODO			if (!ResPath.empty( ))
-////				DeleteFileA( ResPath.c_str( ) );
+//			if (!ResPath.empty( ))
+//				DeleteFileA( ResPath.c_str( ) );
 //
 //			throw;
 //		}
@@ -678,7 +678,7 @@ Environment:
 //		// Close out both files and call it done.
 //		//
 //
-//// TODO		CloseHandle( ResFile );
+//		CloseHandle( ResFile );
 //		Entry->Accessor->CloseFile( Handle );
 //
 //		//
@@ -1089,32 +1089,32 @@ Environment:
 //	NWN::ResType            ResType;
 //	ResRefNameMap::iterator nit;
 //
-//// TODO	if (_splitpath_s(
-////		ResourceFileName.c_str( ),
-////		nullptr,
-////		0,
-////		nullptr,
-////		0,
-////		Name,
-////		sizeof( Name ),
-////		Ext,
-////		sizeof( Ext )) || (Ext[ 0 ] == '\0'))
-////	{
-////		try
-////		{
-////			std::string ErrorStr;
-////
-////			ErrorStr  = "Illegal resource path '";
-////			ErrorStr += ResourceFileName;
-////			ErrorStr += "'.";
-////
-////			throw std::runtime_error( ErrorStr );
-////		}
-////		catch (std::bad_alloc)
-////		{
-////			throw std::runtime_error( "Illegal resource path." );
-////		}
-////	}
+// 	if (_splitpath_s(
+//		ResourceFileName.c_str( ),
+//		nullptr,
+//		0,
+//		nullptr,
+//		0,
+//		Name,
+//		sizeof( Name ),
+//		Ext,
+//		sizeof( Ext )) || (Ext[ 0 ] == '\0'))
+//	{
+//		try
+//		{
+//			std::string ErrorStr;
+//
+//			ErrorStr  = "Illegal resource path '";
+//			ErrorStr += ResourceFileName;
+//			ErrorStr += "'.";
+//
+//			throw std::runtime_error( ErrorStr );
+//		}
+//		catch (std::bad_alloc)
+//		{
+//			throw std::runtime_error( "Illegal resource path." );
+//		}
+//	}
 //
 //	//
 //	// Look up the name in the demand-loaded file list.
@@ -1162,8 +1162,8 @@ Environment:
 //
 //	if (--nit->second.Refs == 0)
 //	{
-//// TODO		if (nit->second.Delete)
-////			DeleteFileA( nit->second.ResourceFileName.c_str( ) );
+//		if (nit->second.Delete)
+//			DeleteFileA( nit->second.ResourceFileName.c_str( ) );
 //
 //		m_NameMap.erase( nit );
 //	}
