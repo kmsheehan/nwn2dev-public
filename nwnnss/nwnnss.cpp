@@ -956,7 +956,7 @@ Environment:
 	{
 		TextOut->WriteText(
 			"Compiling: %s\n",
-			filec);
+            InFile.RefStr);
 	}
 
 	//

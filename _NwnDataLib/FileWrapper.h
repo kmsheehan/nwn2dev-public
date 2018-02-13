@@ -124,12 +124,11 @@ public:
 			m_Size = ftell(m_File);
 			fseek(m_File, 0 , SEEK_SET);// needed for next read from beginning of file
 
-			View = static_cast<unsigned char *>(mmap(0, m_Size, PROT_READ, MAP_SHARED, reinterpret_cast<int>(File), 0));
+			View = static_cast<unsigned char *>(mmap(0, m_Size, PROT_READ, MAP_SHARED, fileno(File), 0));
 
 			if (View != nullptr)
 			{
 				m_Offset = GetFilePointer( );
-				m_Size   = GetFileSize( );
 				m_View   = View;
 			}
 #endif
@@ -226,7 +225,7 @@ public:
 	{
 		LONG  Low;
 		LONG  High;
-		DWORD NewPtrLow;
+		LONGLONG NewPtrLow;
 		char  ExMsg[ 64 ];
 
 		if (m_View != nullptr)
@@ -245,13 +244,13 @@ public:
 			return;
 		}
 
-		Low  = (LONG) ((Offset >>  0) & 0xFFFFFFFF);
+#if defined(_WIN32) && defined(_WIN64)
+        Low  = (LONG) ((Offset >>  0) & 0xFFFFFFFF);
 		High = (LONG) ((Offset >> 32) & 0xFFFFFFFF);
 
-#if defined(_WIN32) && defined(_WIN64)
 		NewPtrLow = SetFilePointer( m_File, Low, &High, FILE_BEGIN );
 #else
-        NewPtrLow = lseek(reinterpret_cast<int>(m_File), Offset, SEEK_SET);
+        NewPtrLow = lseek(fileno(m_File), Offset, SEEK_SET);
 #endif
 
 		if ((NewPtrLow == INVALID_SET_FILE_POINTER))
@@ -270,8 +269,9 @@ public:
 	GetFileSize(
 		) const
 	{
+
 		ULONGLONG Size = 0;
-		DWORD     SizeHigh;
+		DWORD SizeHigh;
 
 		if (m_View != nullptr)
 			return m_Size;
@@ -284,10 +284,10 @@ public:
 			throw std::runtime_error( "GetFileSize failed" );
 		}
 #else
-		if(m_File != nullptr) {
-			fseek(m_File, 0 , SEEK_END);
+		if (m_File != nullptr) {
+			fseek(m_File, 0, SEEK_END);
 			Size = ftell(m_File);
-			fseek(m_File, 0 , SEEK_SET);// needed for next read from beginning of file
+			fseek(m_File, 0, SEEK_SET);// needed for next read from beginning of file
 		}
 #endif
 		return Size; // | ((ULONGLONG) SizeHigh) << 32;
@@ -310,7 +310,7 @@ public:
 			throw std::runtime_error( "SetFilePointerEx failed" );
 
 #else
-        Fp.QuadPart = lseek(reinterpret_cast<int>(m_File), 0, SEEK_CUR ) ;
+        Fp.QuadPart = ftell(m_File);
 #endif
 		return Fp.QuadPart;
 
