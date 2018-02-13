@@ -19,6 +19,9 @@ typedef unsigned long ULONG;
 typedef unsigned char UCHAR;
 typedef unsigned short USHORT;
 typedef char CHAR;
+//typedef ULONG64 FileHandle;
+//typedef ULONG64 FileId;
+//static const FileHandle INVALID_FILE = 0;
 
 #if defined(_WIN64)
 typedef __int64 LONG_PTR;

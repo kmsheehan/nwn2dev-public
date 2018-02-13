@@ -379,6 +379,76 @@ Environment:
 }
 
 
+void
+LoadScriptResources(
+        ResourceManager & ResMan,
+        const std::string & NWNHome,
+        const std::string & InstallDir,
+        bool Erf16
+)
+/*++
+
+Routine Description:
+
+	This routine loads a module into the resource system.
+
+Arguments:
+
+	ResMan - Supplies the ResourceManager instance that is to load the module.
+
+	ModuleName - Supplies the resource name of the module to load.  If an
+	             empty string is supplied, only base game resources are loaded.
+
+	NWNHome - Supplies the users NWN2 home directory (i.e. NWN2 Documents dir).
+
+	InstallDir - Supplies the game installation directory.
+
+	Erf16 - Supplies a Boolean value indicating true if 16-byte ERFs are to be
+	        used (i.e. for NWN1-style modules), else false if 32-byte ERFs are
+	        to be used (i.e. for NWN2-style modules).
+
+	CustomModPath - Optionally supplies an override path to search for a module
+	                file within, bypassing the standard module load heuristics.
+
+Return Value:
+
+	None.  On failure, an std::exception is raised.
+
+Environment:
+
+	User mode.
+
+--*/
+{
+    ResourceManager::ModuleLoadParams   LoadParams;
+    ResourceManager::StringVec          KeyFiles;
+
+    ZeroMemory( &LoadParams, sizeof( LoadParams ) );
+
+    LoadParams.SearchOrder = ResourceManager::ModSearch_PrefDirectory;
+    LoadParams.ResManFlags = ResourceManager::ResManFlagNoGranny2;
+
+    LoadParams.ResManFlags |= ResourceManager::ResManFlagErf16;
+
+    KeyFiles.push_back( "xp3" );
+    KeyFiles.push_back( "xp2patch" );
+    KeyFiles.push_back( "xp2" );
+    KeyFiles.push_back( "xp1patch" );
+    KeyFiles.push_back( "xp1" );
+    KeyFiles.push_back( "chitin" );
+
+    LoadParams.KeyFiles = &KeyFiles;
+
+    LoadParams.ResManFlags |= ResourceManager::ResManFlagBaseResourcesOnly;
+
+    ResMan.LoadScriptResources(
+            NWNHome,
+            InstallDir,
+            &LoadParams
+    );
+}
+
+
 //void
 //LoadModule(
 //	 ResourceManager & ResMan,
@@ -429,82 +499,82 @@ Environment:
 //
 //	ZeroMemory( &LoadParams, sizeof( LoadParams ) );
 //
-//	if (!ModuleName.empty( ) || !CustomModPath.empty( ))
-//	{
-//		//
-//		// Load up the module.  First, we load just the core module resources,
-//		// then we determine the HAK list and load all of the HAKs up too.
-//		//
-//		// Turn off granny2 loading as it's unnecessary for this program, and
-//		// prefer to load directory modules (as changes to ERF modules aren't
-//		// saved).
-//		//
-//
-//		LoadParams.SearchOrder = ResourceManager::ModSearch_PrefDirectory;
-//		LoadParams.ResManFlags = ResourceManager::ResManFlagNoGranny2          |
-//		                         ResourceManager::ResManFlagLoadCoreModuleOnly |
-//		                         ResourceManager::ResManFlagRequireModuleIfo;
-//
-//		if (Erf16)
-//			LoadParams.ResManFlags |= ResourceManager::ResManFlagErf16;
-//
-//		if (!CustomModPath.empty( ))
-//			LoadParams.CustomModuleSourcePath = CustomModPath.c_str( );
-//
-//		ResMan.LoadModuleResources(
-//			ModuleName,
-//			"",
-//			NWNHome,
-//			InstallDir,
-//			HAKList,
-//			&LoadParams);
-//
-//		{
-//			DemandResourceStr                ModuleIfoFile( ResMan, "module", NWN::ResIFO );
-//			GffFileReader                    ModuleIfo( ModuleIfoFile, ResMan );
-//			const GffFileReader::GffStruct * RootStruct = ModuleIfo.GetRootStruct( );
-//			GffFileReader::GffStruct         Struct;
-//			size_t                           Offset;
-//
-//			RootStruct->GetCExoString( "Mod_CustomTlk", CustomTlk );
-//
-//			//
-//			// Chop off the .tlk extension in the CustomTlk field if we had one.
-//			//
-//
-//			if ((Offset = CustomTlk.rfind( '.' )) != std::string::npos)
-//				CustomTlk.erase( Offset );
-//
-//			for (size_t i = 0; i <= UCHAR_MAX; i += 1)
-//			{
-//				GffFileReader::GffStruct Hak;
-//				NWN::ResRef32            HakRef;
-//
-//				if (!RootStruct->GetListElement( "Mod_HakList", i, Hak ))
-//					break;
-//
-//				if (!Hak.GetCExoStringAsResRef( "Mod_Hak", HakRef ))
-//					throw std::runtime_error( "Failed to read Mod_HakList.Mod_Hak" );
-//
-//				HAKList.push_back( HakRef );
-//			}
-//
-//			//
-//			// If there were no haks, then try the legacy field.
-//			//
-//
-//			if (HAKList.empty( ))
-//			{
-//				NWN::ResRef32 HakRef;
-//
-//				if ((RootStruct->GetCExoStringAsResRef( "Mod_Hak", HakRef )) &&
-//					 (HakRef.RefStr[ 0 ] != '\0'))
-//				{
-//					HAKList.push_back( HakRef );
-//				}
-//			}
-//		}
-//	}
+////	if (!ModuleName.empty( ) || !CustomModPath.empty( ))
+////	{
+////		//
+////		// Load up the module.  First, we load just the core module resources,
+////		// then we determine the HAK list and load all of the HAKs up too.
+////		//
+////		// Turn off granny2 loading as it's unnecessary for this program, and
+////		// prefer to load directory modules (as changes to ERF modules aren't
+////		// saved).
+////		//
+////
+////		LoadParams.SearchOrder = ResourceManager::ModSearch_PrefDirectory;
+////		LoadParams.ResManFlags = ResourceManager::ResManFlagNoGranny2          |
+////		                         ResourceManager::ResManFlagLoadCoreModuleOnly |
+////		                         ResourceManager::ResManFlagRequireModuleIfo;
+////
+////		if (Erf16)
+////			LoadParams.ResManFlags |= ResourceManager::ResManFlagErf16;
+////
+////		if (!CustomModPath.empty( ))
+////			LoadParams.CustomModuleSourcePath = CustomModPath.c_str( );
+////
+////		ResMan.LoadModuleResources(
+////			ModuleName,
+////			"",
+////			NWNHome,
+////			InstallDir,
+////			HAKList,
+////			&LoadParams);
+////
+////		{
+////			DemandResourceStr                ModuleIfoFile( ResMan, "module", NWN::ResIFO );
+////			GffFileReader                    ModuleIfo( ModuleIfoFile, ResMan );
+////			const GffFileReader::GffStruct * RootStruct = ModuleIfo.GetRootStruct( );
+////			GffFileReader::GffStruct         Struct;
+////			size_t                           Offset;
+////
+////			RootStruct->GetCExoString( "Mod_CustomTlk", CustomTlk );
+////
+////			//
+////			// Chop off the .tlk extension in the CustomTlk field if we had one.
+////			//
+////
+////			if ((Offset = CustomTlk.rfind( '.' )) != std::string::npos)
+////				CustomTlk.erase( Offset );
+////
+////			for (size_t i = 0; i <= UCHAR_MAX; i += 1)
+////			{
+////				GffFileReader::GffStruct Hak;
+////				NWN::ResRef32            HakRef;
+////
+////				if (!RootStruct->GetListElement( "Mod_HakList", i, Hak ))
+////					break;
+////
+////				if (!Hak.GetCExoStringAsResRef( "Mod_Hak", HakRef ))
+////					throw std::runtime_error( "Failed to read Mod_HakList.Mod_Hak" );
+////
+////				HAKList.push_back( HakRef );
+////			}
+////
+////			//
+////			// If there were no haks, then try the legacy field.
+////			//
+////
+////			if (HAKList.empty( ))
+////			{
+////				NWN::ResRef32 HakRef;
+////
+////				if ((RootStruct->GetCExoStringAsResRef( "Mod_Hak", HakRef )) &&
+////					 (HakRef.RefStr[ 0 ] != '\0'))
+////				{
+////					HAKList.push_back( HakRef );
+////				}
+////			}
+////		}
+////	}
 //
 //	//
 //	// Now perform a full load with the HAK list and CustomTlk available.
@@ -542,8 +612,9 @@ Environment:
 //		LoadParams.KeyFiles = &KeyFiles;
 //	}
 //
-//	if (ModuleName.empty( ) && CustomModPath.empty( ))
-//		LoadParams.ResManFlags |= ResourceManager::ResManFlagBaseResourcesOnly;
+////	if (ModuleName.empty( ) && CustomModPath.empty( ))
+//
+//    LoadParams.ResManFlags |= ResourceManager::ResManFlagBaseResourcesOnly;
 //
 //	if (!CustomModPath.empty( ))
 //		LoadParams.CustomModuleSourcePath = CustomModPath.c_str( );
@@ -2105,12 +2176,12 @@ Environment:
 	bool                       Compile            = true;
 	bool                       Optimize           = false;
 	bool                       EnableExtensions   = false;
-	bool                       NoDebug            = false;
+	bool                       NoDebug            = true;
 	bool                       Quiet              = false;
 	int                        CompilerVersion    = 999999;
 	bool                       Error              = false;
 	bool                       LoadResources      = false;
-	bool                       Erf16              = false;
+	bool                       Erf16              = true;
 	bool                       ResponseFile       = false;
 	int                        ReturnCode         = 0;
 	bool                       VerifyCode         = false;
@@ -2150,9 +2221,9 @@ Environment:
 					switch (towlower( (wint_t) (unsigned) Switch ))
 					{
 
-					case '1':
-						Erf16 = true;
-						break;
+//					case '1':
+//						Erf16 = true;
+//						break;
 
 					case 'a':
 						VerifyCode = true;
@@ -2191,7 +2262,7 @@ Environment:
 						break;
 
 					case 'g':
-						NoDebug = true;
+						NoDebug = false;
 						break;
 
 					case 'h':
@@ -2245,30 +2316,30 @@ Environment:
 						LoadResources = true;
 						break;
 
-					case 'm':
-						{
-							LoadResources = true;
-
-							if (i + 1 >= argc)
-							{
-								wprintf( L"Error: Malformed arguments.\n" );
-								Error = true;
-								break;
-							}
-
-                            ModuleName = argv[ i + 1 ];
-
-							if (ModuleName.empty( ))
-							{
-								printf(
-									"Error: Module resource name must not be empty.\n");
-								Error = true;
-								break;
-							}
-
-							i += 1;
-						};
-						break;
+//					case 'm':
+//						{
+//							LoadResources = true;
+//
+//							if (i + 1 >= argc)
+//							{
+//								wprintf( L"Error: Malformed arguments.\n" );
+//								Error = true;
+//								break;
+//							}
+//
+//                            ModuleName = argv[ i + 1 ];
+//
+//							if (ModuleName.empty( ))
+//							{
+//								printf(
+//									"Error: Module resource name must not be empty.\n");
+//								Error = true;
+//								break;
+//							}
+//
+//							i += 1;
+//						};
+//						break;
 
 					case 'n':
 						{
@@ -2304,20 +2375,20 @@ Environment:
 						Quiet = true;
 						break;
 
-					case 'r':
-						{
-							if (i + 1 >= argc)
-							{
-								printf( "Error: Malformed arguments.\n" );
-								Error = true;
-								break;
-							}
-
-                            CustomModPath = argv[ i + 1 ];
-
-							i += 1;
-						}
-						break;
+//					case 'r':
+//						{
+//							if (i + 1 >= argc)
+//							{
+//								printf( "Error: Malformed arguments.\n" );
+//								Error = true;
+//								break;
+//							}
+//
+//                            CustomModPath = argv[ i + 1 ];
+//
+//							i += 1;
+//						}
+//						break;
 
 					case 'v':
 						{
@@ -2480,35 +2551,34 @@ Environment:
 	{
 		printf(
 			"Usage:\n"
-			"NWNScriptCompiler [-1acdegjkloq] [-b batchoutdir] [-h homedir]\n"
-			"                  [[-i pathspec] ...] [-m resref] [-n installdir]\n"
-			"                  [-r modpath] [-v#] [-x errprefix] [-y]\n"
+			"NWNScriptCompiler [-acdegjkloq] [-b batchoutdir] [-h homedir]\n"
+			"                  [[-i pathspec] ...] [-n installdir]\n"
+			"                  [-v#] [-x errprefix] [-y]\n"
 			"                  infile [outfile|infiles]\n"
 			"  batchoutdir - Supplies the location at which batch mode places\n"
 			"                output files and enables multiple input filenames.\n"
 			"  homedir - Per-user NWN home directory (i.e. Documents\\Neverwinter Nights).\n"
 			"  pathspec - Semicolon separated list of directories to search for\n"
 			"             additional includes.\n"
-			"  resref - Resource name of module to load (without extension).\n"
-			"           Note that loading a module is potentially slow.\n"
+//			"  resref - Resource name of module to load (without extension).\n"
+//			"           Note that loading a module is potentially slow.\n"
 			"  installdir - NWN install directory.\n"
-			"  modpath - Supplies the full path to the .mod (or directory) that\n"
-			"            contains the module.ifo for the module to load.  This\n"
-			"            option overrides the [-r resref] option.\n"
+//			"  modpath - Supplies the full path to the .mod (or directory) that\n"
+//			"            contains the module.ifo for the module to load.  This\n"
+//			"            option overrides the [-r resref] option.\n"
 			"  errprefix - Prefix string to prepend to compiler errors (replacing\n"
 			"              the default of \"Error\").\n"
-			"  -1 - Assume NWN1-style module and KEY/BIF resources instead of\n"
-			"       NWN2-style module and ZIP resources.\n"
-			"  -a - Analyze generated code and verify that it is consistent\n"
-			"       (increases compilation time).\n"
+//			"  -1 - Assume NWN1-style module and KEY/BIF resources instead of\n"
+//			"       NWN2-style module and ZIP resources.\n"
+//			"  -a - Analyze generated code and verify that it is consistent\n"
+//			"       (increases compilation time).\n"
 			"  -c - Compile the script (default, overrides -d).\n"
 			"  -d - Disassemble the script (overrides -c).\n"
 			"  -e - Enable non-BioWare extensions.\n"
-			"  -g - Suppress generation of .ndb debug symbols file.\n"
+			"  -g - Enable generation of .ndb debug symbols file.\n"
 			"  -j - Show where include file are being sourced from.\n"
 			"  -k - Show preprocessed source text to console output.\n"
-			"  -l - Load base game resources even if -m isn't supplied (slow),\n"
-			"       so that \"in-box\" standard includes can be resolved.\n"
+			"  -l - Load base game resources so that standard includes can be resolved.\n"
 			"  -o - Optimize the compiled script.\n"
 			"  -p - Dump internal PCode for compiled script contributions.\n"
 			"  -q - Silence most messages.\n"
@@ -2551,17 +2621,17 @@ Environment:
 
 		if (!Quiet)
 		{
-			if (ModuleName.empty( ))
-			{
+//			if (ModuleName.empty( ))
+//			{
 				g_TextOut.WriteText(
 					"Loading base game resources...\n");
-			}
-			else
-			{
-				g_TextOut.WriteText(
-					"Loading resources for module '%s'...\n",
-					ModuleName.c_str( ));
-			}
+//			}
+//			else
+//			{
+//				g_TextOut.WriteText(
+//					"Loading resources for module '%s'...\n",
+//					ModuleName.c_str( ));
+//			}
 		}
 
 		if (InstallDir.empty( ))
@@ -2575,13 +2645,11 @@ Environment:
 		if (HomeDir.empty( ))
 			HomeDir = GetNwnHomePath( );
 
-//		LoadModule(
-//			*g_ResMan,
-//			ModuleName,
-//			HomeDir,
-//			InstallDir,
-//			Erf16,
-//			CustomModPath);
+		LoadScriptResources(
+			*g_ResMan,
+			HomeDir,
+			InstallDir,
+			Erf16);
 	}
 
 	//

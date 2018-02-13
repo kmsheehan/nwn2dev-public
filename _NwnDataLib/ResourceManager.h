@@ -22,7 +22,7 @@ Abstract:
 
 #include "ResourceAccessor.h"
 #include "GffFileReader.h"
-//#include "../_NwnBaseLib/NWNBaseLib.h"
+#include "KeyFileReader.h"
 
 
 struct IDebugTextOut;
@@ -265,6 +265,18 @@ public:
 //		 ModuleLoadParams * LoadParams = NULL
 //		);
 //
+    //
+    // Called to load resources for a module after resources are available,
+    // i.e. after autodownload completes.
+    //
+
+    void
+    LoadScriptResources(
+            const std::string & HomeDir,
+            const std::string & InstallDir,
+            ModuleLoadParams * LoadParams = NULL
+    );
+
 //	//
 //	// Called to pre-load module resources.  This routine is used by the server
 //	// as the module must be loaded to discover parameters such as the HAK list
@@ -398,16 +410,16 @@ public:
 //		 const NWN::ResRef32 & ResType,
 //		 NWN::ResType Type
 //		);
-
-	//
-	// Release a reference to a previously demand-loaded resource file.
-	//
-
-	void
-	Release(
-		 const std::string & ResourceName
-		);
-
+//
+//	//
+//	// Release a reference to a previously demand-loaded resource file.
+//	//
+//
+//	void
+//	Release(
+//		 const std::string & ResourceName
+//		);
+//
 	//
 	// Retrieve the resource manager's temp file path.  Files created under
 	// this path will be cleaned up by last-ditch cleanup when a new resource
@@ -850,16 +862,16 @@ private:
 //	void
 //	LoadZipArchives(
 //		);
-//
-//	//
-//	// Load all in-box .key/.bif archives.
-//	//
-//
-//	void
-//	LoadFixedKeyFiles(
-//		 const StringVec & KeyFiles
-//		);
-//
+
+	//
+	// Load all in-box .key/.bif archives.
+	//
+
+	void
+	LoadFixedKeyFiles(
+		 const StringVec & KeyFiles
+		);
+
 //	//
 //	// Load custom resource providers.
 //	//
@@ -980,8 +992,8 @@ private:
 	AllocateFileHandle(
 		);
 
-
-
+	typedef KeyFileReader16 KeyFileReader;
+    typedef swutil::SharedPtr< KeyFileReader > KeyFileReaderPtr;
 
 	//
 	// Define the resource handle type, to which a FileHandle refers to for the
@@ -1063,6 +1075,12 @@ private:
 	typedef std::vector< IResourceAccessor * > ResourceAccessorVec;
 
 	//
+	// Demand load key file list.
+	//
+
+	typedef std::vector< KeyFileReaderPtr > KeyFileVec;
+
+	//
 	// Open handle mapping, used to redirect requests for service to their
 	// underlying resource accessor implementations.
 	//
@@ -1111,6 +1129,12 @@ private:
 	//
 
 	ResourceAccessorVec       m_ResourceFiles[ MAX_TIERS ];
+
+	//
+	// Key files loaded.
+	//
+
+	KeyFileVec                m_KeyFiles;
 
 	//
 	// Mapping of all demanded files to resrefs.
@@ -1162,8 +1186,7 @@ private:
 
 	HANDLE                    m_InstanceEvent;
 
-
-	//
+    //
 	// Define operational flags for the resource manager.  Legal values are
 	// drawn from ResManFlags.
 	//

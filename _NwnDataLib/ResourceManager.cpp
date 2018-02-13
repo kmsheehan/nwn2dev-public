@@ -160,39 +160,39 @@ Environment:
 //	 const std::vector< NWN::ResRef32 > & HAKs,
 //	 ModuleLoadParams * LoadParams /* = nullptr */
 //	)
-//*++
-//
-//Routine Description:
-//
-//	This routine is invoked when all module resources have been downloaded and
-//	are available.  It bears responsibility for loading always-load resources
-//	such as TLK files, as well as setting up other state necessary for the
-//	proper servicing of demand-load requests.
-//
-//Arguments:
-//
-//	ModuleResName - Supplies the resource name of the current module.
-//
-//	AltTlkFileName - Optionally supplies the name of an alternate tlk file.
-//
-//	HomeDir - Supplies the game home directory, i.e. Docs\Neverwinter Nights 2.
-//
-//	InstallDir - Supplies the installation directory of the game.
-//
-//	HAKs - Supplies the list of HAK files to load.
-//
-//	LoadParams - Optionally supplies extended module load parameters, such as
-//	             the campaign ID.
-//
-//Return Value:
-//
-//	The routine raises an std::exception on catastrophic failure.
-//
-//Environment:
-//
-//	User mode.
-//
-//--*/
+////*++
+////
+////Routine Description:
+////
+////	This routine is invoked when all module resources have been downloaded and
+////	are available.  It bears responsibility for loading always-load resources
+////	such as TLK files, as well as setting up other state necessary for the
+////	proper servicing of demand-load requests.
+////
+////Arguments:
+////
+////	ModuleResName - Supplies the resource name of the current module.
+////
+////	AltTlkFileName - Optionally supplies the name of an alternate tlk file.
+////
+////	HomeDir - Supplies the game home directory, i.e. Docs\Neverwinter Nights 2.
+////
+////	InstallDir - Supplies the installation directory of the game.
+////
+////	HAKs - Supplies the list of HAK files to load.
+////
+////	LoadParams - Optionally supplies extended module load parameters, such as
+////	             the campaign ID.
+////
+////Return Value:
+////
+////	The routine raises an std::exception on catastrophic failure.
+////
+////Environment:
+////
+////	User mode.
+////
+////--*/
 //{
 //	LoadModuleResourcesInternal(
 //		ModuleResName,
@@ -1898,48 +1898,48 @@ Environment:
 //	 ModuleLoadParams * LoadParams,
 //	 bool PartialLoadOnly
 //	)
-///*++
-//
-//Routine Description:
-//
-//	This routine is invoked when all module resources have been downloaded and
-//	are available.  It bears responsibility for loading always-load resources
-//	such as TLK files, as well as setting up other state necessary for the
-//	proper servicing of demand-load requests.
-//
-//Arguments:
-//
-//	ModuleResName - Supplies the resource name of the current module.
-//
-//	AltTlkFileName - Optionally supplies the name of an alternate tlk file.
-//
-//	HomeDir - Supplies the game home directory, i.e. Docs\Neverwinter Nights 2.
-//
-//	InstallDir - Supplies the installation directory of the game.
-//
-//	HAKs - Supplies the list of HAK files to load.
-//
-//	LoadParams - Optionally supplies extended module load parameters, such as
-//	             the campaign ID.
-//
-//	PartialLoadOnly - Supplies a Boolean value that indicates whether only a
-//	                  partial load, enough to pull data out of the module GFF
-//	                  resources, should be performed.
-//
-//Return Value:
-//
-//	The routine raises an std::exception on catastrophic failure.
-//
-//Environment:
-//
-//	User mode.
-//
-//--*/
+////*++
+////
+////Routine Description:
+////
+////	This routine is invoked when all module resources have been downloaded and
+////	are available.  It bears responsibility for loading always-load resources
+////	such as TLK files, as well as setting up other state necessary for the
+////	proper servicing of demand-load requests.
+////
+////Arguments:
+////
+////	ModuleResName - Supplies the resource name of the current module.
+////
+////	AltTlkFileName - Optionally supplies the name of an alternate tlk file.
+////
+////	HomeDir - Supplies the game home directory, i.e. Docs\Neverwinter Nights 2.
+////
+////	InstallDir - Supplies the installation directory of the game.
+////
+////	HAKs - Supplies the list of HAK files to load.
+////
+////	LoadParams - Optionally supplies extended module load parameters, such as
+////	             the campaign ID.
+////
+////	PartialLoadOnly - Supplies a Boolean value that indicates whether only a
+////	                  partial load, enough to pull data out of the module GFF
+////	                  resources, should be performed.
+////
+////Return Value:
+////
+////	The routine raises an std::exception on catastrophic failure.
+////
+////Environment:
+////
+////	User mode.
+////
+////--*/
 //{
 //	std::string Tlk;
 //	int         Cp;
 //
-//	CleanDemandLoadedFiles( );
+//	//CleanDemandLoadedFiles( );
 //
 //	m_ModuleResName = ModuleResName;
 //	m_HomeDir       = HomeDir;
@@ -1951,9 +1951,9 @@ Environment:
 //	// character set to begin with.
 //	//
 //
-//// TODO	Cp = _getmbcp( );
+//	//Cp = _getmbcp( );
 //
-//	_setmbcp( _MB_CP_SBCS );
+//	//_setmbcp( _MB_CP_SBCS );
 //
 //	if (LoadParams != nullptr)
 //		m_ResManFlags = LoadParams->ResManFlags;
@@ -2087,6 +2087,72 @@ Environment:
 //
 //	_setmbcp( Cp );
 //}
+
+
+void
+ResourceManager::LoadScriptResources (
+		const std::string & HomeDir,
+		const std::string & InstallDir,
+		ModuleLoadParams * LoadParams
+)
+//*++
+//
+//Routine Description:
+//
+//	This routine is invoked when all module resources have been downloaded and
+//	are available.  It bears responsibility for loading always-load resources
+//	such as TLK files, as well as setting up other state necessary for the
+//	proper servicing of demand-load requests.
+//
+//Arguments:
+//
+//	ModuleResName - Supplies the resource name of the current module.
+//
+//	AltTlkFileName - Optionally supplies the name of an alternate tlk file.
+//
+//	HomeDir - Supplies the game home directory, i.e. Docs\Neverwinter Nights 2.
+//
+//	InstallDir - Supplies the installation directory of the game.
+//
+//	HAKs - Supplies the list of HAK files to load.
+//
+//	LoadParams - Optionally supplies extended module load parameters, such as
+//	             the campaign ID.
+//
+//	PartialLoadOnly - Supplies a Boolean value that indicates whether only a
+//	                  partial load, enough to pull data out of the module GFF
+//	                  resources, should be performed.
+//
+//Return Value:
+//
+//	The routine raises an std::exception on catastrophic failure.
+//
+//Environment:
+//
+//	User mode.
+//
+//--*/
+{
+	m_HomeDir       = HomeDir;
+	m_InstallDir    = InstallDir;
+
+	if (LoadParams != nullptr)
+		m_ResManFlags = LoadParams->ResManFlags;
+	else
+		m_ResManFlags = 0;
+
+	try
+	{
+        if (LoadParams != nullptr && LoadParams->KeyFiles != nullptr)
+            LoadFixedKeyFiles( *LoadParams->KeyFiles );
+
+	}
+	catch (...)
+	{
+		throw;
+	}
+
+}
 
 
 //void
@@ -2405,85 +2471,85 @@ Environment:
 //}
 
 
-//void
-//ResourceManager::LoadFixedKeyFiles(
-//	 const StringVec & KeyFiles
-//	)
-///*++
-//
-//Routine Description:
-//
-//	This routine registers in-box .key/.bif archives with the resource
-//	management system.
-//
-//Arguments:
-//
-//	KeyFiles - Supplies the list of key file RESREFs to load.  Earlier listed
-//	           RESREFs take priority over later listed RESREFs.
-//
-//Return Value:
-//
-//	None.  Raises an std::exception on failure.
-//
-//Environment:
-//
-//	User mode.
-//
-//--*/
-//{
-//	std::string              KeyFileName;
-//#if PERF_TRACE
-//	ULONG                    TimeSpent;
-//
-//	TimeSpent = GetTickCount( );
-//#endif
-//
-//	//
-//	// Load all .key archives (and their associated .bif files) specified.
-//	//
-//
-//	for (StringVec::const_reverse_iterator it = KeyFiles.rbegin( );
-//	     it != KeyFiles.rend( );
-//	     ++it)
-//	{
-//		KeyFileName =  m_InstallDir;
-//		KeyFileName += "/";
-//		KeyFileName += *it;
-//		KeyFileName += ".key";
-//
-//		//
-//		// Create a .key reader context and register the resource file
-//		// provider in the master provider list.
-//		//
-//
-//		try
-//		{
-//			KeyFileReaderPtr KeyRes;
-//
-//			ResDebug2(
-//				"ResourceManager::LoadFixedKeyFiles: Loading key file '%s'...\n",
-//				KeyFileName.c_str( ));
-//
-//			KeyRes = new KeyFileReader( KeyFileName, m_InstallDir );
-//
-//			m_KeyFiles.push_back( KeyRes );
-//			m_ResourceFiles[ TIER_INBOX_KEY ].push_back( KeyRes.get( ) );
-//		}
-//		catch (std::exception &e)
-//		{
-//			e;
-//			ResDebug2(
-//				"WARNING: Failed to open .key archive '%s': exception '%s'.\n",
-//				KeyFileName.c_str( ),
-//				e.what( ));
-//		}
-//	}
-//
-//
-//#if PERF_TRACE
-//	m_TextWriter->WriteText( "FIXEDKEYLOAD: %lu\n", GetTickCount( ) - TimeSpent );
-//#endif
-//}
+void
+ResourceManager::LoadFixedKeyFiles(
+	 const StringVec & KeyFiles
+	)
+/*++
+
+Routine Description:
+
+	This routine registers in-box .key/.bif archives with the resource
+	management system.
+
+Arguments:
+
+	KeyFiles - Supplies the list of key file RESREFs to load.  Earlier listed
+	           RESREFs take priority over later listed RESREFs.
+
+Return Value:
+
+	None.  Raises an std::exception on failure.
+
+Environment:
+
+	User mode.
+
+--*/
+{
+	std::string              KeyFileName;
+#if PERF_TRACE
+	ULONG                    TimeSpent;
+
+	TimeSpent = GetTickCount( );
+#endif
+
+	//
+	// Load all .key archives (and their associated .bif files) specified.
+	//
+
+	for (StringVec::const_reverse_iterator it = KeyFiles.rbegin( );
+	     it != KeyFiles.rend( );
+	     ++it)
+	{
+		KeyFileName =  m_InstallDir;
+		KeyFileName += "/";
+		KeyFileName += *it;
+		KeyFileName += ".key";
+
+		//
+		// Create a .key reader context and register the resource file
+		// provider in the master provider list.
+		//
+
+		try
+		{
+			KeyFileReaderPtr KeyRes;
+
+			printf(
+				"ResourceManager::LoadFixedKeyFiles: Loading key file '%s'...\n",
+				KeyFileName.c_str( ));
+
+			KeyRes = new KeyFileReader( KeyFileName, m_InstallDir );
+
+			m_KeyFiles.push_back( KeyRes );
+			m_ResourceFiles[ TIER_INBOX_KEY ].push_back( KeyRes.get( ) );
+		}
+		catch (std::exception &e)
+		{
+			e;
+			printf(
+				"WARNING: Failed to open .key archive '%s': exception '%s'.\n",
+				KeyFileName.c_str( ),
+				e.what( ));
+		}
+	}
+
+
+#if PERF_TRACE
+	m_TextWriter->WriteText( "FIXEDKEYLOAD: %lu\n", GetTickCount( ) - TimeSpent );
+#endif
+}
 
 //void
 //ResourceManager::LoadCustomResourceProviders(

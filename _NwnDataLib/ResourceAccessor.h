@@ -33,6 +33,8 @@ Abstract:
 // system.
 //
 
+
+
 template< typename ResRefT >
 struct IResourceAccessor
 {
@@ -43,6 +45,18 @@ struct IResourceAccessor
 
 	static const FileHandle INVALID_FILE = 0;
 
+
+	enum AccessorType
+	{
+		AccessorTypeBif,
+		AccessorTypeErf,
+		AccessorTypeDirectory,
+		AccessorTypeKey,
+		AccessorTypeZip,
+		AccessorTypeResourceManager,
+		AccessorTypeCustom
+	};
+
 	//
 	// Open an encapsulated file by resref.
 	//
@@ -50,7 +64,7 @@ struct IResourceAccessor
 	virtual
 	FileHandle
 	OpenFile(
-		 const NWN::ResRef32 & ResRef,
+		 const ResRefT & ResRef,
 		 ResType Type
 		) = 0;
 
@@ -118,7 +132,7 @@ struct IResourceAccessor
 	bool
 	GetEncapsulatedFileEntry(
 		 FileId FileIndex,
-		 NWN::ResRef32 & ResRef,
+		 ResRefT & ResRef,
 		 ResType & Type
 		) = 0;
 
@@ -130,17 +144,6 @@ struct IResourceAccessor
 	FileId
 	GetEncapsulatedFileCount(
 		) = 0;
-
-	enum AccessorType
-	{
-		AccessorTypeBif,
-		AccessorTypeErf,
-		AccessorTypeDirectory,
-		AccessorTypeKey,
-		AccessorTypeZip,
-		AccessorTypeResourceManager,
-		AccessorTypeCustom
-	};
 
 	//
 	// Get the logical name of this accessor.
