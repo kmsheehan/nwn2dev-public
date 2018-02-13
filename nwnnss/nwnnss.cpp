@@ -382,7 +382,8 @@ LoadScriptResources(
         ResourceManager & ResMan,
         const std::string & NWNHome,
         const std::string & InstallDir,
-        bool Erf16
+        bool Erf16,
+        int Compilerversion
 )
 /*++
 
@@ -428,12 +429,16 @@ Environment:
 
     LoadParams.ResManFlags |= ResourceManager::ResManFlagErf16;
 
-    KeyFiles.push_back( "xp3" );
-    KeyFiles.push_back( "xp2patch" );
-    KeyFiles.push_back( "xp2" );
-    KeyFiles.push_back( "xp1patch" );
-    KeyFiles.push_back( "xp1" );
-    KeyFiles.push_back( "chitin" );
+    if (Compilerversion >= 174) {
+        KeyFiles.push_back("data/nwn_base");
+    } else {
+        KeyFiles.push_back("xp3");
+        KeyFiles.push_back("xp2patch");
+        KeyFiles.push_back("xp2");
+        KeyFiles.push_back("xp1patch");
+        KeyFiles.push_back("xp1");
+        KeyFiles.push_back("chitin");
+    }
 
     LoadParams.KeyFiles = &KeyFiles;
 
@@ -456,7 +461,7 @@ Environment:
 //	 bool Erf16,
 //	 const std::string & CustomModPath
 //	)
-///*++
+//*++
 //
 //Routine Description:
 //
@@ -497,82 +502,82 @@ Environment:
 //
 //	ZeroMemory( &LoadParams, sizeof( LoadParams ) );
 //
-////	if (!ModuleName.empty( ) || !CustomModPath.empty( ))
-////	{
-////		//
-////		// Load up the module.  First, we load just the core module resources,
-////		// then we determine the HAK list and load all of the HAKs up too.
-////		//
-////		// Turn off granny2 loading as it's unnecessary for this program, and
-////		// prefer to load directory modules (as changes to ERF modules aren't
-////		// saved).
-////		//
-////
-////		LoadParams.SearchOrder = ResourceManager::ModSearch_PrefDirectory;
-////		LoadParams.ResManFlags = ResourceManager::ResManFlagNoGranny2          |
-////		                         ResourceManager::ResManFlagLoadCoreModuleOnly |
-////		                         ResourceManager::ResManFlagRequireModuleIfo;
-////
-////		if (Erf16)
-////			LoadParams.ResManFlags |= ResourceManager::ResManFlagErf16;
-////
-////		if (!CustomModPath.empty( ))
-////			LoadParams.CustomModuleSourcePath = CustomModPath.c_str( );
-////
-////		ResMan.LoadModuleResources(
-////			ModuleName,
-////			"",
-////			NWNHome,
-////			InstallDir,
-////			HAKList,
-////			&LoadParams);
-////
-////		{
-////			DemandResourceStr                ModuleIfoFile( ResMan, "module", NWN::ResIFO );
-////			GffFileReader                    ModuleIfo( ModuleIfoFile, ResMan );
-////			const GffFileReader::GffStruct * RootStruct = ModuleIfo.GetRootStruct( );
-////			GffFileReader::GffStruct         Struct;
-////			size_t                           Offset;
-////
-////			RootStruct->GetCExoString( "Mod_CustomTlk", CustomTlk );
-////
-////			//
-////			// Chop off the .tlk extension in the CustomTlk field if we had one.
-////			//
-////
-////			if ((Offset = CustomTlk.rfind( '.' )) != std::string::npos)
-////				CustomTlk.erase( Offset );
-////
-////			for (size_t i = 0; i <= UCHAR_MAX; i += 1)
-////			{
-////				GffFileReader::GffStruct Hak;
-////				NWN::ResRef32            HakRef;
-////
-////				if (!RootStruct->GetListElement( "Mod_HakList", i, Hak ))
-////					break;
-////
-////				if (!Hak.GetCExoStringAsResRef( "Mod_Hak", HakRef ))
-////					throw std::runtime_error( "Failed to read Mod_HakList.Mod_Hak" );
-////
-////				HAKList.push_back( HakRef );
-////			}
-////
-////			//
-////			// If there were no haks, then try the legacy field.
-////			//
-////
-////			if (HAKList.empty( ))
-////			{
-////				NWN::ResRef32 HakRef;
-////
-////				if ((RootStruct->GetCExoStringAsResRef( "Mod_Hak", HakRef )) &&
-////					 (HakRef.RefStr[ 0 ] != '\0'))
-////				{
-////					HAKList.push_back( HakRef );
-////				}
-////			}
-////		}
-////	}
+//	if (!ModuleName.empty( ) || !CustomModPath.empty( ))
+//	{
+//		//
+//		// Load up the module.  First, we load just the core module resources,
+//		// then we determine the HAK list and load all of the HAKs up too.
+//		//
+//		// Turn off granny2 loading as it's unnecessary for this program, and
+//		// prefer to load directory modules (as changes to ERF modules aren't
+//		// saved).
+//		//
+//
+//		LoadParams.SearchOrder = ResourceManager::ModSearch_PrefDirectory;
+//		LoadParams.ResManFlags = ResourceManager::ResManFlagNoGranny2          |
+//		                         ResourceManager::ResManFlagLoadCoreModuleOnly |
+//		                         ResourceManager::ResManFlagRequireModuleIfo;
+//
+//		if (Erf16)
+//			LoadParams.ResManFlags |= ResourceManager::ResManFlagErf16;
+//
+//		if (!CustomModPath.empty( ))
+//			LoadParams.CustomModuleSourcePath = CustomModPath.c_str( );
+//
+//		ResMan.LoadModuleResources(
+//			ModuleName,
+//			"",
+//			NWNHome,
+//			InstallDir,
+//			HAKList,
+//			&LoadParams);
+//
+//		{
+//			DemandResourceStr                ModuleIfoFile( ResMan, "module", NWN::ResIFO );
+//			GffFileReader                    ModuleIfo( ModuleIfoFile, ResMan );
+//			const GffFileReader::GffStruct * RootStruct = ModuleIfo.GetRootStruct( );
+//			GffFileReader::GffStruct         Struct;
+//			size_t                           Offset;
+//
+//			RootStruct->GetCExoString( "Mod_CustomTlk", CustomTlk );
+//
+//			//
+//			// Chop off the .tlk extension in the CustomTlk field if we had one.
+//			//
+//
+//			if ((Offset = CustomTlk.rfind( '.' )) != std::string::npos)
+//				CustomTlk.erase( Offset );
+//
+//			for (size_t i = 0; i <= UCHAR_MAX; i += 1)
+//			{
+//				GffFileReader::GffStruct Hak;
+//				NWN::ResRef32            HakRef;
+//
+//				if (!RootStruct->GetListElement( "Mod_HakList", i, Hak ))
+//					break;
+//
+//				if (!Hak.GetCExoStringAsResRef( "Mod_Hak", HakRef ))
+//					throw std::runtime_error( "Failed to read Mod_HakList.Mod_Hak" );
+//
+//				HAKList.push_back( HakRef );
+//			}
+//
+//			//
+//			// If there were no haks, then try the legacy field.
+//			//
+//
+//			if (HAKList.empty( ))
+//			{
+//				NWN::ResRef32 HakRef;
+//
+//				if ((RootStruct->GetCExoStringAsResRef( "Mod_Hak", HakRef )) &&
+//					 (HakRef.RefStr[ 0 ] != '\0'))
+//				{
+//					HAKList.push_back( HakRef );
+//				}
+//			}
+//		}
+//	}
 //
 //	//
 //	// Now perform a full load with the HAK list and CustomTlk available.
@@ -2176,9 +2181,9 @@ Environment:
 	bool                       EnableExtensions   = false;
 	bool                       NoDebug            = true;
 	bool                       Quiet              = false;
-	int                        CompilerVersion    = 999999;
+	int                        CompilerVersion    = 174;
 	bool                       Error              = false;
-	bool                       LoadResources      = false;
+	bool                       LoadResources      = true;
 	bool                       Erf16              = true;
 	bool                       ResponseFile       = false;
 	int                        ReturnCode         = 0;
@@ -2647,7 +2652,8 @@ Environment:
 			*g_ResMan,
 			HomeDir,
 			InstallDir,
-			Erf16);
+			Erf16,
+            CompilerVersion);
 	}
 
 	//
