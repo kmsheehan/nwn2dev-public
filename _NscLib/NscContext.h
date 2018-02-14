@@ -62,7 +62,9 @@
 #define YYSTYPE CNscPStackEntry *
 #include "NscParser.h"
 
-#if defined(_WIN32)
+#if defined(__linux__)
+#include <stdarg.h>
+#elif(_WIN32)
 #ifndef STRSAFE_NO_DEPRECATE
 #define STRSAFE_NO_DEPRECATE 1
 #endif

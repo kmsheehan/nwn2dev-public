@@ -26,6 +26,10 @@ Abstract:
 #include "../_NscLib/Nsc.h"
 #include "../_NwnUtilLib/findfirst.h"
 
+#if defined(__linux__)
+#include <stdarg.h>
+#endif
+
 typedef std::vector< std::string > StringVec;
 typedef std::vector< const char * > StringArgVec;
 

@@ -6,7 +6,7 @@
 #define NWN_TOOLS_OSCOMPAT_H
 
 #include <cstdint>
-#include <string>
+#include <string.h>
 
 #if !defined(_WIN32) && !defined(_WIN64)
 typedef unsigned long DWORD;

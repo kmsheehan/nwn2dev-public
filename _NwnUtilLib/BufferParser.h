@@ -5,6 +5,9 @@
 
 #ifdef _MSC_VER
 #pragma once
+#elif(__linux__)
+#include <unistd.h>
+#include <string.h>
 #endif
 
 namespace swutil
