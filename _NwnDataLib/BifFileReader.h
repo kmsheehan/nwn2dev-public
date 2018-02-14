@@ -171,7 +171,8 @@ private:
 	//
 
 //#include <pshpack1.h>
-
+#pragma pack (push,1)
+#pragma pack (1)
 	typedef struct _BIF_HEADER
 	{
 		unsigned long FileType;                // "BIFF"
@@ -192,7 +193,7 @@ private:
 	} BIF_RESOURCE, * PBIF_RESOURCE;
 
 	typedef const struct _BIF_RESOURCE * PCBIF_RESOURCE;
-
+#pragma pack (pop)
 //#include <poppack.h>
 
 	typedef std::vector< BIF_RESOURCE > BifResourceVec;
@@ -222,7 +223,7 @@ private:
 	//
 
 	HANDLE             m_File;
-	unsigned long      m_FileSize;
+    ULONGLONG          m_FileSize;
 	FileWrapper        m_FileWrapper;
 	ULONGLONG          m_NextOffset;
 	std::string        m_BifFileName;

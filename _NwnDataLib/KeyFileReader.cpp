@@ -735,6 +735,8 @@ Environment:
 
 		BifPath += Name;
 
+		BifPath = OsCompat::ReplaceAll(BifPath,"\\","/");
+
 		BifFile = new BifFileReaderT( BifPath );
 
 		m_BifFiles.push_back( BifFile );

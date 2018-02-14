@@ -972,14 +972,13 @@ private:
 //	DeleteDirectoryFiles(
 //		 const char * DirPath
 //		);
-//
-//	//
-//	// Scan all resource accessors and create the master resource id list.
-//	//
-//
-//	void
-//	DiscoverResources(
-//		);
+
+	//
+	// Scan all resource accessors and create the master resource id list.
+	//
+
+	void
+	DiscoverResources();
 
 	//
 	// Allocate a file handle for the overarching resource manager file

@@ -244,9 +244,10 @@ public:
 			return;
 		}
 
-#if defined(_WIN32) && defined(_WIN64)
         Low  = (LONG) ((Offset >>  0) & 0xFFFFFFFF);
-		High = (LONG) ((Offset >> 32) & 0xFFFFFFFF);
+        High = (LONG) ((Offset >> 32) & 0xFFFFFFFF);
+
+#if defined(_WIN32) && defined(_WIN64)
 
 		NewPtrLow = SetFilePointer( m_File, Low, &High, FILE_BEGIN );
 #else

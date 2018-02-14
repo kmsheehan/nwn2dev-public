@@ -16,6 +16,7 @@ Abstract:
 #include "Precomp.h"
 #include "BifFileReader.h"
 
+
 template< typename ResRefT >
 BifFileReader< ResRefT >::BifFileReader(
 	 const std::string & FileName
@@ -46,9 +47,9 @@ Environment:
   m_NextOffset( 0 ),
   m_BifFileName( FileName )
 {
-#if defined(_WIN32) && defined(_WIN64)
 	HANDLE File;
 
+#if defined(_WIN32) && defined(_WIN64)
 	File = CreateFileA(
 		FileName.c_str( ),
 		GENERIC_READ,
@@ -110,6 +111,32 @@ Environment:
 	C_ASSERT( sizeof( BIF_HEADER ) == 5 * 4 );
 	C_ASSERT( sizeof( BIF_RESOURCE ) == 4 * 4 );
 #else
+	File = fopen(FileName.c_str(),"r");
+
+	if (File == nullptr)
+		throw std::runtime_error( "Failed to open BIF file. " );
+
+	m_File = File;
+	m_FileWrapper.SetFileHandle( File, true );
+
+	try
+	{
+        m_FileSize = m_FileWrapper.GetFileSize();
+
+		if ((m_FileSize == 0xFFFFFFFF))
+			throw std::runtime_error( "Failed to read file size." );
+
+		ParseBifFile();
+	}
+	catch (...)
+	{
+		fclose( File );
+
+		throw;
+	}
+
+	fclose( File );
+
 #endif
 }
 
@@ -147,6 +174,8 @@ Environment:
 		m_File = nullptr;
 	}
 }
+
+
 
 template< typename ResRefT >
 typename BifFileReader< ResRefT >::FileHandle

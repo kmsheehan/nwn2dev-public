@@ -160,6 +160,7 @@ public:
     static std::string getFileExt(const std::string &s);
     static char *filename(const char *str);
     char * extname(const char *str);
-};
+    static std::string ReplaceAll(std::string str, const std::string& from, const std::string& to);
+    };
 
 #endif //NWN_TOOLS_OSCOMPAT_H

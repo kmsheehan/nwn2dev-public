@@ -2146,6 +2146,7 @@ ResourceManager::LoadScriptResources (
         if (LoadParams != nullptr && LoadParams->KeyFiles != nullptr)
             LoadFixedKeyFiles( *LoadParams->KeyFiles );
 
+		DiscoverResources();
 	}
 	catch (...)
 	{
@@ -2513,7 +2514,7 @@ Environment:
 	     ++it)
 	{
 		KeyFileName =  m_InstallDir;
-		KeyFileName += "/";
+//		KeyFileName += "/";
 		KeyFileName += *it;
 		KeyFileName += ".key";
 
@@ -2826,177 +2827,177 @@ Environment:
 //
 //	return FilesForceClosed;
 //}
-//
-//
-//void
-//ResourceManager::DiscoverResources(
-//	)
-///*++
-//
-//Routine Description:
-//
-//	This routine discovers all resources across all loaded resource accessors,
-//	creating resource index entries for each resource.  The canonical order of
-//	resource providers and names within a provider is preserved.
-//
-//Arguments:
-//
-//	None.
-//
-//Return Value:
-//
-//	None.  Raises an std::exception on catastrophic failure.
-//
-//Environment:
-//
-//	User mode.
-//
-//--*/
-//{
-//	ResourceEntry Entry;
-//	FileId        MaxId;
-//	ResRefT       ResRef;
-//	ResType       Type;
-//	char          TypeStr[ 32 ];
-//	std::string   LookupName;
-//	FileId        ResourceCount;
-//#if defined(RES_DEBUG) && RES_DEBUG >= 1
-//	DWORD         TimeSpent;
-//#endif
-//
-//	//
-//	// First, total all files available to minimize reallocation.
-//	//
-//
-//	ResourceCount = 0;
-//
-//	for (size_t i = 0; i < MAX_TIERS; i += 1)
-//	{
-//		for (ResourceAccessorVec::reverse_iterator it = m_ResourceFiles[ i ].rbegin( );
-//		     it != m_ResourceFiles[ i ].rend( );
-//		     ++it)
-//		{
-//			ResourceCount += (*it)->GetEncapsulatedFileCount( );
-//		}
-//	}
-//
-//	m_ResourceEntries.reserve( (size_t) ResourceCount );
-//
-//#if defined(RES_DEBUG) && RES_DEBUG >= 1
-//	m_TextWriter->WriteText( "Indexing %lu resources...\n", ResourceCount );
-//
-//	TimeSpent = GetTickCount( );
-//#endif
-//
-//	//
-//	// Search each tier in turn.
-//	//
-//
-//	for (size_t i = 0; i < MAX_TIERS; i += 1)
-//	{
-//		size_t j;
-//
-//		//
-//		// Search each tier in order, based on the defined behavior of the
-//		// BioWare resource manager.  The most recently added resource provider
-//		// is searched first.
-//		//
-//
-//		j = 0;
-//
-//		for (ResourceAccessorVec::reverse_iterator it = m_ResourceFiles[ i ].rbegin( );
-//		     it != m_ResourceFiles[ i ].rend( );
-//		     ++it)
-//		{
-//			j += 1;
-//
-//			MaxId = (*it)->GetEncapsulatedFileCount( );
-//
-//			//
-//			// Iterate over each file, creating file entries for each resource
-//			// type in turn.
-//			//
-//			// We search in reverse order, taking the last entry.  This allows
-//			// us to preserve the order of the most recent entry of a
-//			// particular tier winning, used to ensure that we retrieve the
-//			// most precedent patched file for inbox datafiles.
-//			//
-//
-//			for (FileId CurId = MaxId; CurId != 0; CurId -= 1)
-//			{
-//				const char * p;
-//
-//				//
-//				// Get the resource name and type at this index.
-//				//
-//
-//				if (!(*it)->GetEncapsulatedFileEntry(
-//					CurId - 1,
-//					ResRef,
-//					Type))
-//				{
-//					//
-//					// It might be an unrecognized type, ignore it if so.
-//					//
-//					continue;
-//				}
-//
-//				p = (const char *) memchr(
-//					ResRef.RefStr,
-//					'\0',
-//					sizeof( ResRef.RefStr ) );
-//
-//				//
-//				// Ensure that we have not already claimed this name yet.  We
-//				// allow only one mapping for a particular name (+type), and it
-//				// is the most precedent one in the canonical search order.
-//				//
-//
-//				//LookupName = _itoa( (int) Type, TypeStr, 10 );
-//				snprintf(TypeStr, sizeof(TypeStr),"%d",Type);
-//				LookupName = TypeStr;
-//				LookupName.push_back( 'T' );
-//
-//				if (p == nullptr)
-//					LookupName.append( ResRef.RefStr, sizeof( ResRef.RefStr ) );
-//				else
-//					LookupName.append( ResRef.RefStr, p - ResRef.RefStr );
-//
-//				//
-//				// Skip duplicate entry, we've already found the most precedent
-//				// version.
-//				//
-//
-//				if (m_NameIdMap.find( LookupName ) != m_NameIdMap.end( ))
-//					continue;
-//
-//				//
-//				// First one, add it as the most precedent.
-//				//
-//
-//				Entry.Accessor  = (*it);
-//				Entry.FileIndex = CurId - 1;
-//				Entry.Tier      = i;
-//				Entry.TierIndex = j;
-//
-////				m_TextWriter->WriteText( "Found %s\n", LookupName.c_str( ) );
-//
-//				m_ResourceEntries.push_back( Entry );
-//
-//				m_NameIdMap.insert(
-//					ResourceEntryMap::value_type(
-//						LookupName,
-//						m_ResourceEntries.size( ) - 1
-//						)
-//					);
-//			}
-//		}
-//	}
-//
-//#if defined(RES_DEBUG) && RES_DEBUG >= 1
-//	m_TextWriter->WriteText( "DISCOVER: %lu\n", GetTickCount( ) - TimeSpent );
-//#endif
-//}
+
+
+void
+ResourceManager::DiscoverResources(
+	)
+/*++
+
+Routine Description:
+
+	This routine discovers all resources across all loaded resource accessors,
+	creating resource index entries for each resource.  The canonical order of
+	resource providers and names within a provider is preserved.
+
+Arguments:
+
+	None.
+
+Return Value:
+
+	None.  Raises an std::exception on catastrophic failure.
+
+Environment:
+
+	User mode.
+
+--*/
+{
+	ResourceEntry Entry;
+	FileId        MaxId;
+	ResRefT       ResRef;
+	ResType       Type;
+	char          TypeStr[ 32 ];
+	std::string   LookupName;
+	FileId        ResourceCount;
+#if defined(RES_DEBUG) && RES_DEBUG >= 1
+	DWORD         TimeSpent;
+#endif
+
+	//
+	// First, total all files available to minimize reallocation.
+	//
+
+	ResourceCount = 0;
+
+	for (size_t i = 0; i < MAX_TIERS; i += 1)
+	{
+		for (ResourceAccessorVec::reverse_iterator it = m_ResourceFiles[ i ].rbegin( );
+		     it != m_ResourceFiles[ i ].rend( );
+		     ++it)
+		{
+			ResourceCount += (*it)->GetEncapsulatedFileCount( );
+		}
+	}
+
+	m_ResourceEntries.reserve( (size_t) ResourceCount );
+
+#if defined(RES_DEBUG) && RES_DEBUG >= 1
+	m_TextWriter->WriteText( "Indexing %lu resources...\n", ResourceCount );
+
+	TimeSpent = GetTickCount( );
+#endif
+
+	//
+	// Search each tier in turn.
+	//
+
+	for (size_t i = 0; i < MAX_TIERS; i += 1)
+	{
+		size_t j;
+
+		//
+		// Search each tier in order, based on the defined behavior of the
+		// BioWare resource manager.  The most recently added resource provider
+		// is searched first.
+		//
+
+		j = 0;
+
+		for (ResourceAccessorVec::reverse_iterator it = m_ResourceFiles[ i ].rbegin( );
+		     it != m_ResourceFiles[ i ].rend( );
+		     ++it)
+		{
+			j += 1;
+
+			MaxId = (*it)->GetEncapsulatedFileCount( );
+
+			//
+			// Iterate over each file, creating file entries for each resource
+			// type in turn.
+			//
+			// We search in reverse order, taking the last entry.  This allows
+			// us to preserve the order of the most recent entry of a
+			// particular tier winning, used to ensure that we retrieve the
+			// most precedent patched file for inbox datafiles.
+			//
+
+			for (FileId CurId = MaxId; CurId != 0; CurId -= 1)
+			{
+				const char * p;
+
+				//
+				// Get the resource name and type at this index.
+				//
+
+				if (!(*it)->GetEncapsulatedFileEntry(
+					CurId - 1,
+					ResRef,
+					Type))
+				{
+					//
+					// It might be an unrecognized type, ignore it if so.
+					//
+					continue;
+				}
+
+				p = (const char *) memchr(
+					ResRef.RefStr,
+					'\0',
+					sizeof( ResRef.RefStr ) );
+
+				//
+				// Ensure that we have not already claimed this name yet.  We
+				// allow only one mapping for a particular name (+type), and it
+				// is the most precedent one in the canonical search order.
+				//
+
+				//LookupName = _itoa( (int) Type, TypeStr, 10 );
+				snprintf(TypeStr, sizeof(TypeStr),"%d",Type);
+				LookupName = TypeStr;
+				LookupName.push_back( 'T' );
+
+				if (p == nullptr)
+					LookupName.append( ResRef.RefStr, sizeof( ResRef.RefStr ) );
+				else
+					LookupName.append( ResRef.RefStr, p - ResRef.RefStr );
+
+				//
+				// Skip duplicate entry, we've already found the most precedent
+				// version.
+				//
+
+				if (m_NameIdMap.find( LookupName ) != m_NameIdMap.end( ))
+					continue;
+
+				//
+				// First one, add it as the most precedent.
+				//
+
+				Entry.Accessor  = (*it);
+				Entry.FileIndex = CurId - 1;
+				Entry.Tier      = i;
+				Entry.TierIndex = j;
+
+//				m_TextWriter->WriteText( "Found %s\n", LookupName.c_str( ) );
+
+				m_ResourceEntries.push_back( Entry );
+
+				m_NameIdMap.insert(
+					ResourceEntryMap::value_type(
+						LookupName,
+						m_ResourceEntries.size( ) - 1
+						)
+					);
+			}
+		}
+	}
+
+#if defined(RES_DEBUG) && RES_DEBUG >= 1
+	m_TextWriter->WriteText( "DISCOVER: %lu\n", GetTickCount( ) - TimeSpent );
+#endif
+}
 
 ResourceManager::FileHandle
 ResourceManager::AllocateFileHandle(

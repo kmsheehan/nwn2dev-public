@@ -185,7 +185,8 @@ private:
 	//
 
 //#include <pshpack1.h>
-
+#pragma pack (push,1)
+#pragma pack (1)
 	typedef struct _KEY_HEADER
 	{
 		unsigned long FileType;                // "KEY "
@@ -219,6 +220,7 @@ private:
 	} KEY_RESOURCE, * PKEY_RESOURCE;
 
 	//typedef const struct _KEY_FILE * PCKEY_FILE;
+#pragma pack (pop)
 
 //#include <poppack.h>
 
