@@ -70,9 +70,7 @@ public:
 	virtual
 	void
 	WriteText(
-		  const char* fmt,
-		...
-		)
+		  const char* fmt, ...)
 	{
 		va_list ap;
 
@@ -842,8 +840,6 @@ Environment:
     FileName = OsCompat::filename(FileName);
     Extension = OsCompat::getFileExt(InFile.c_str());
 
-    printf(" --- File [%s] Ext [%s]\n",FileName,Extension.c_str());
-
 #endif
 
 //	if (Extension[ 0 ] != '.') {
@@ -857,9 +853,6 @@ Environment:
 //    }
 
 	FileResRef = ResMan.ResRef32FromStr( FileName );
-
-    printf(" --- File [%s]\n",FileResRef.RefStr);
-
 
     //
 	// Load the file directly if we can, otherwise attempt it via the resource
@@ -959,13 +952,9 @@ Environment:
 
     strncpy(filec,InFile.RefStr,_MAX_FNAME);
 
-    printf (" <<< Compiling [%s] [%s]\n", InFile.RefStr,filec);
-
     if (!Quiet)
 	{
-		TextOut->WriteText(
-			"Compiling: %s\n",
-            InFile.RefStr);
+		TextOut->WriteText("Compiling: %s\n",InFile);
 	}
 
 	//
@@ -1740,8 +1729,6 @@ Environment:
 	// Pull in the input file first.
 	//
 
-    printf(">>> Filename %s\n",InFile.c_str());
-
 	if (!LoadInputFile(
 		ResMan,
 		TextOut,
@@ -1755,8 +1742,6 @@ Environment:
 
 		return false;
 	}
-
-    printf(">>> Filename [%s] [%s]\n",InFile.c_str(),FileResRef.RefStr);
 
     //
 	// Now execute the main operation.
