@@ -1271,7 +1271,7 @@ Environment:
 			Entry->Accessor->CloseFile( AccessorHandle );
 
 			m_TextWriter->WriteText(
-				"WARNING: Exception '%s' loading resource '%.32s' (type %04X).\n",
+				"WARNING: Exception '%%s' loading resource '%%s' (type %%04X).\n",
 				e.what( ),
 				FileName.RefStr,
 				(unsigned short) Type );
@@ -1349,7 +1349,7 @@ Environment:
 				(*it)->CloseFile( AccessorHandle );
 
 				m_TextWriter->WriteText(
-					"WARNING: Exception '%s' loading resource '%.32s'.\n",
+					"WARNING: Exception '%s' loading resource '%%s'.\n",
 					e.what( ),
 					FileName.RefStr );
 
@@ -1463,7 +1463,7 @@ Environment:
 		Entry->Accessor->CloseFile( AccessorHandle );
 
 		m_TextWriter->WriteText(
-			"WARNING: Exception '%s' loading resource '%.32s' (type %04X).\n",
+			"WARNING: Exception '%s' loading resource '%%' (type %%04X).\n",
 			e.what( ),
 			FileName.RefStr,
 			(unsigned short) Type );
@@ -2527,9 +2527,9 @@ Environment:
 		{
 			KeyFileReaderPtr KeyRes;
 
-			printf(
-				"ResourceManager::LoadFixedKeyFiles: Loading key file '%s'...\n",
-				KeyFileName.c_str( ));
+//			printf(
+//				"ResourceManager::LoadFixedKeyFiles: Loading key file '%s'...\n",
+//				KeyFileName.c_str( ));
 
 			KeyRes = new KeyFileReader( KeyFileName, m_InstallDir );
 
@@ -2548,7 +2548,7 @@ Environment:
 
 
 #if PERF_TRACE
-	m_TextWriter->WriteText( "FIXEDKEYLOAD: %lu\n", GetTickCount( ) - TimeSpent );
+	m_TextWriter->WriteText( "FIXEDKEYLOAD: %%lu\n", GetTickCount( ) - TimeSpent );
 #endif
 }
 
@@ -2884,7 +2884,7 @@ Environment:
 	m_ResourceEntries.reserve( (size_t) ResourceCount );
 
 #if defined(RES_DEBUG) && RES_DEBUG >= 1
-	m_TextWriter->WriteText( "Indexing %lu resources...\n", ResourceCount );
+	m_TextWriter->WriteText( "Indexing %%lu resources...\n", ResourceCount );
 
 	TimeSpent = GetTickCount( );
 #endif
@@ -2995,7 +2995,7 @@ Environment:
 	}
 
 #if defined(RES_DEBUG) && RES_DEBUG >= 1
-	m_TextWriter->WriteText( "DISCOVER: %lu\n", GetTickCount( ) - TimeSpent );
+	m_TextWriter->WriteText( "DISCOVER: %%lu\n", GetTickCount( ) - TimeSpent );
 #endif
 }
 

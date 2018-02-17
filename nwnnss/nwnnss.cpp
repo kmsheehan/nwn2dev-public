@@ -22,7 +22,6 @@ Abstract:
 #include <iostream>
 #include "../_NwnDataLib/TextOut.h"
 #include "../_NwnDataLib/ResourceManager.h"
-//#include "../_NwnDataLib/NWScriptReader.h"
 #include "../_NscLib/Nsc.h"
 #include "../_NwnUtilLib/findfirst.h"
 
@@ -33,8 +32,6 @@ Abstract:
 typedef std::vector< std::string > StringVec;
 typedef std::vector< const char * > StringArgVec;
 
-//NWACTION_TYPE ConvertNscType(NscType Type);
-
 typedef enum _NSCD_FLAGS
 {
 	//
@@ -44,9 +41,8 @@ typedef enum _NSCD_FLAGS
 	NscDFlag_StopOnError             = 0x00000001,
 
 	NscDFlag_LastFlag
-} NSCD_FLAGS, * PNSCD_FLAGS;
+};
 
-typedef const enum _NSCD_FLAGS * PCNSCD_FLAGS;
 
 FILE * g_Log;
 
@@ -118,12 +114,8 @@ public:
 	--*/
 	{
 		char buf[8193];
-#if !defined(_WIN32) && !defined(_WIN64)
-		sprintf(buf, fmt, ap);
-#else
-		StringCbVPrintfA(buf, sizeof( buf ), fmt, ap);
-#endif
-		//DWORD n = strlen(buf);
+
+		snprintf(buf, sizeof( buf ), fmt, ap);
 
 		puts( buf );
 
@@ -154,91 +146,6 @@ public:
 
 };
 
-class WriteFileTextOut : public IDebugTextOut
-{
-
-public:
-
-	inline
-	WriteFileTextOut(
-		 FILE * OutFile
-		)
-	: m_OutFile( OutFile )
-	{
-	}
-
-	inline
-	~WriteFileTextOut(
-		)
-	{
-	}
-
-	inline
-	virtual
-	void
-	WriteText(
-		  const char* fmt,
-		...
-		)
-	{
-		va_list ap;
-
-		va_start( ap, fmt );
-		WriteTextV(fmt, ap );
-		va_end( ap );
-	}
-
-	inline
-	virtual
-	void
-	WriteTextV(
-		  const char* fmt,
-		 va_list ap
-		)
-	/*++
-
-	Routine Description:
-
-		This routine displays text to the output file associated with the output
-		object.
-
-		The console output may have color attributes supplied, as per the standard
-		SetConsoleTextAttribute API.
-
-	Arguments:
-
-		Attributes - Supplies color attributes for the text as per the standard
-					 SetConsoleTextAttribute API (e.g. FOREGROUND_RED).
-
-		fmt - Supplies the printf-style format string to use to display text.
-
-		argptr - Supplies format inserts.
-
-	Return Value:
-
-		None.
-
-	Environment:
-
-		User mode.
-
-	--*/
-	{
-		char buf[8193];
-#if !defined(_WIN32) && !defined(_WIN64)
-		sprintf(buf, fmt, ap);
-#else
-		StringCbVPrintfA(buf, sizeof( buf ), fmt, ap);
-#endif
-		fputs( buf, m_OutFile );
-
-	}
-
-private:
-
-	FILE * m_OutFile;
-
-};
 
 //
 // No reason these should be globals, except for ease of access to the debugger
@@ -454,185 +361,6 @@ Environment:
 }
 
 
-//void
-//LoadModule(
-//	 ResourceManager & ResMan,
-//	 const std::string & ModuleName,
-//	 const std::string & NWNHome,
-//	 const std::string & InstallDir,
-//	 bool Erf16,
-//	 const std::string & CustomModPath
-//	)
-//*++
-//
-//Routine Description:
-//
-//	This routine loads a module into the resource system.
-//
-//Arguments:
-//
-//	ResMan - Supplies the ResourceManager instance that is to load the module.
-//
-//	ModuleName - Supplies the resource name of the module to load.  If an
-//	             empty string is supplied, only base game resources are loaded.
-//
-//	NWNHome - Supplies the users NWN2 home directory (i.e. NWN2 Documents dir).
-//
-//	InstallDir - Supplies the game installation directory.
-//
-//	Erf16 - Supplies a Boolean value indicating true if 16-byte ERFs are to be
-//	        used (i.e. for NWN1-style modules), else false if 32-byte ERFs are
-//	        to be used (i.e. for NWN2-style modules).
-//
-//	CustomModPath - Optionally supplies an override path to search for a module
-//	                file within, bypassing the standard module load heuristics.
-//
-//Return Value:
-//
-//	None.  On failure, an std::exception is raised.
-//
-//Environment:
-//
-//	User mode.
-//
-//--*/
-//{
-//	std::vector< NWN::ResRef32 >        HAKList;
-//	std::string                         CustomTlk;
-//	ResourceManager::ModuleLoadParams   LoadParams;
-//	ResourceManager::StringVec          KeyFiles;
-//
-//	ZeroMemory( &LoadParams, sizeof( LoadParams ) );
-//
-//	if (!ModuleName.empty( ) || !CustomModPath.empty( ))
-//	{
-//		//
-//		// Load up the module.  First, we load just the core module resources,
-//		// then we determine the HAK list and load all of the HAKs up too.
-//		//
-//		// Turn off granny2 loading as it's unnecessary for this program, and
-//		// prefer to load directory modules (as changes to ERF modules aren't
-//		// saved).
-//		//
-//
-//		LoadParams.SearchOrder = ResourceManager::ModSearch_PrefDirectory;
-//		LoadParams.ResManFlags = ResourceManager::ResManFlagNoGranny2          |
-//		                         ResourceManager::ResManFlagLoadCoreModuleOnly |
-//		                         ResourceManager::ResManFlagRequireModuleIfo;
-//
-//		if (Erf16)
-//			LoadParams.ResManFlags |= ResourceManager::ResManFlagErf16;
-//
-//		if (!CustomModPath.empty( ))
-//			LoadParams.CustomModuleSourcePath = CustomModPath.c_str( );
-//
-//		ResMan.LoadModuleResources(
-//			ModuleName,
-//			"",
-//			NWNHome,
-//			InstallDir,
-//			HAKList,
-//			&LoadParams);
-//
-//		{
-//			DemandResourceStr                ModuleIfoFile( ResMan, "module", NWN::ResIFO );
-//			GffFileReader                    ModuleIfo( ModuleIfoFile, ResMan );
-//			const GffFileReader::GffStruct * RootStruct = ModuleIfo.GetRootStruct( );
-//			GffFileReader::GffStruct         Struct;
-//			size_t                           Offset;
-//
-//			RootStruct->GetCExoString( "Mod_CustomTlk", CustomTlk );
-//
-//			//
-//			// Chop off the .tlk extension in the CustomTlk field if we had one.
-//			//
-//
-//			if ((Offset = CustomTlk.rfind( '.' )) != std::string::npos)
-//				CustomTlk.erase( Offset );
-//
-//			for (size_t i = 0; i <= UCHAR_MAX; i += 1)
-//			{
-//				GffFileReader::GffStruct Hak;
-//				NWN::ResRef32            HakRef;
-//
-//				if (!RootStruct->GetListElement( "Mod_HakList", i, Hak ))
-//					break;
-//
-//				if (!Hak.GetCExoStringAsResRef( "Mod_Hak", HakRef ))
-//					throw std::runtime_error( "Failed to read Mod_HakList.Mod_Hak" );
-//
-//				HAKList.push_back( HakRef );
-//			}
-//
-//			//
-//			// If there were no haks, then try the legacy field.
-//			//
-//
-//			if (HAKList.empty( ))
-//			{
-//				NWN::ResRef32 HakRef;
-//
-//				if ((RootStruct->GetCExoStringAsResRef( "Mod_Hak", HakRef )) &&
-//					 (HakRef.RefStr[ 0 ] != '\0'))
-//				{
-//					HAKList.push_back( HakRef );
-//				}
-//			}
-//		}
-//	}
-//
-//	//
-//	// Now perform a full load with the HAK list and CustomTlk available.
-//	//
-//	// N.B.  The DemandResourceStr above must go out of scope before we issue a
-//	//       new load, as it references a temporary file that will be cleaned up
-//	//       by the new load request.
-//	//
-//
-//	ZeroMemory( &LoadParams, sizeof( LoadParams ) );
-//
-//	//
-//	// Load up the module.  First, we load just the core module resources, then
-//	// we determine the HAK list and load all of the HAKs up too.
-//	//
-//	// Turn off granny2 loading as it's unnecessary for this program, and prefer
-//	// to load directory modules (as changes to ERF modules aren't saved).
-//	//
-//
-//	LoadParams.SearchOrder = ResourceManager::ModSearch_PrefDirectory;
-//	LoadParams.ResManFlags = ResourceManager::ResManFlagNoGranny2         |
-//	                         ResourceManager::ResManFlagRequireModuleIfo;
-//
-//	if (Erf16)
-//	{
-//		LoadParams.ResManFlags |= ResourceManager::ResManFlagErf16;
-//
-//		KeyFiles.push_back( "xp3" );
-//		KeyFiles.push_back( "xp2patch" );
-//		KeyFiles.push_back( "xp2" );
-//		KeyFiles.push_back( "xp1patch" );
-//		KeyFiles.push_back( "xp1" );
-//		KeyFiles.push_back( "chitin" );
-//
-//		LoadParams.KeyFiles = &KeyFiles;
-//	}
-//
-////	if (ModuleName.empty( ) && CustomModPath.empty( ))
-//
-//    LoadParams.ResManFlags |= ResourceManager::ResManFlagBaseResourcesOnly;
-//
-//	if (!CustomModPath.empty( ))
-//		LoadParams.CustomModuleSourcePath = CustomModPath.c_str( );
-//
-//	ResMan.LoadModuleResources(
-//		ModuleName,
-//		CustomTlk,
-//		NWNHome,
-//		InstallDir,
-//		HAKList,
-//		&LoadParams
-//		);
-//}
 
 bool
 LoadFileFromDisk(
@@ -820,7 +548,7 @@ Environment:
 		Extension))
 	{
 		TextOut->WriteText(
-			"Error: Malformed file pathname \"%s\".\n", InFile.c_str( ));
+			"Error: Malformed file pathname \"%%s\".\n", InFile.c_str( ));
 
 		return false;
 	}
@@ -842,15 +570,11 @@ Environment:
 
 #endif
 
-//	if (Extension[ 0 ] != '.') {
-//        FileResType = NWN::ResINVALID;
-//    } else {
 #if defined(_WIN32) && defined(_WIN64)
         FileResType = ResMan.ExtToResType(Extension + 1);
 #else
         FileResType = ResMan.ExtToResType(Extension.c_str());
 #endif
-//    }
 
 	FileResRef = ResMan.ResRef32FromStr( FileName );
 
@@ -863,12 +587,6 @@ Environment:
     {
 		return LoadFileFromDisk( InFile, FileContents );
 	}
-//	else
-//	{
-//		DemandResource32 DemandRes( ResMan, FileResRef, FileResType );
-//
-//		return LoadFileFromDisk( DemandRes, FileContents );
-//	}
 }
 
 bool
@@ -954,7 +672,7 @@ Environment:
 
     if (!Quiet)
 	{
-		TextOut->WriteText("Compiling: %s\n",InFile);
+		TextOut->WriteText("Compiling: %%s\n",InFile);
 	}
 
 	//
@@ -986,8 +704,8 @@ Environment:
 		if (!Quiet)
 		{
 			TextOut->WriteText(
-				"%.32s.nss is an include file, ignored.\n",
-				InFile.RefStr);
+				"%%s.nss is an include file, ignored.\n",
+				InFile);
 		}
 
 		return true;
@@ -1015,7 +733,7 @@ Environment:
 	if (f == nullptr)
 	{
 		TextOut->WriteText(
-			"Error: Unable to open output file \"%s\".\n",
+			"Error: Unable to open output file %%s.\n",
 			FileName.c_str( ));
 
 		return false;
@@ -1028,7 +746,7 @@ Environment:
 			fclose( f );
 
 			TextOut->WriteText(
-				"Error: Failed to write to output file \"%s\".\n",
+				"Error: Failed to write to output file %%s.\n",
 				FileName.c_str( ));
 
 			return false;
@@ -1047,7 +765,7 @@ Environment:
 		if (f == nullptr)
 		{
 			TextOut->WriteText(
-				"Error: Failed to open debug symbols file \"%s\".\n",
+				"Error: Failed to open debug symbols file %%s.\n",
 				FileName.c_str( ));
 
 			return false;
@@ -1060,7 +778,7 @@ Environment:
 				fclose( f );
 
 				TextOut->WriteText(
-					"Error: Failed to write to debug symbols file \"%s\".\n",
+					"Error: Failed to write to debug symbols file %%s.\n",
 					FileName.c_str( ));
 
 				return false;
@@ -1070,171 +788,9 @@ Environment:
 		fclose( f );
 	}
 
-//	if (VerifyCode)
-//	{
-//		try
-//		{
-//			std::vector< NWACTION_DEFINITION >          ActionDefs;
-//			std::list< NscPrototypeDefinition >         ActionPrototypes;
-//			std::list< std::vector< NWACTION_TYPE > >   ActionTypes;
-//			NWSCRIPT_ACTION                             ActionId;
-//
-//			//
-//			// Build the action definition table for the static analysis phase.
-//			// The table is generated dynamically based on the compiled
-//			// nwscript.nss
-//			//
-//
-//			for (ActionId = 0;
-//				  ;
-//				  ActionId += 1)
-//			{
-//				NWACTION_DEFINITION          ActionDef;
-//				NscPrototypeDefinition       ActionPrototype;
-//
-//				if (!Compiler.NscGetActionPrototype( (int) ActionId, ActionPrototype ))
-//					break;
-//
-//				ActionPrototypes.push_back( ActionPrototype );
-//
-//				ZeroMemory( &ActionDef, sizeof( ActionDef ) );
-//
-//				ActionDef.Name            = ActionPrototypes.back( ).Name.c_str( );
-//				ActionDef.ActionId        = ActionId;
-//				ActionDef.MinParameters   = ActionPrototype.MinParameters;
-//				ActionDef.NumParameters   = ActionPrototype.NumParameters;
-//				ActionDef.ReturnType      = ConvertNscType( ActionPrototype.ReturnType );
-//
-//				//
-//				// Convert parameter types over.
-//				//
-//
-//				ActionTypes.push_back( std::vector< NWACTION_TYPE >( ) );
-//				std::vector< NWACTION_TYPE > & ReturnTypes = ActionTypes.back( );
-//
-//				ReturnTypes.resize( ActionPrototype.ParameterTypes.size( ) );
-//
-//				for (size_t i = 0; i < ActionPrototype.ParameterTypes.size( ); i += 1)
-//				{
-//					ReturnTypes[ i ] = ConvertNscType(
-//						ActionPrototype.ParameterTypes[ i ] );
-//				}
-//
-//				if (!ReturnTypes.empty( ))
-//					ActionDef.ParameterTypes = &ReturnTypes[ 0 ];
-//				else
-//					ActionDef.ParameterTypes = nullptr;
-//
-//				ActionDefs.push_back( ActionDef );
-//			}
-//
-//			FileName  = OutBaseFile;
-//			FileName += ".ncs";
-//
-//			//
-//			// Create a script reader over the compiled script, and hand it off to
-//			// an analyzer instance.
-//			//
-//
-//			NWScriptReader ScriptReader( FileName.c_str( ) );
-//
-//			if (!SuppressDebugSymbols)
-//			{
-//				FileName  = OutBaseFile;
-//				FileName += ".ndb";
-//
-//				ScriptReader.LoadSymbols( FileName );
-//			}
-//
-//			//
-//			// Perform the analysis and generate the IR.
-//			//
-//
-//			NWScriptAnalyzer ScriptAnalyzer(
-//				TextOut,
-//				(!ActionDefs.empty( )) ? &ActionDefs[ 0 ] : nullptr,
-//				(NWSCRIPT_ACTION) ActionDefs.size( ));
-//
-//			ScriptAnalyzer.Analyze(
-//				&ScriptReader,
-//				0 );
-//		}
-//		catch (NWScriptAnalyzer::script_error &e)
-//		{
-//			TextOut->WriteText(
-//				"Error: (Verifier error): Analyzer exception '%s' ('%s') at PC=%08X, SP=%08X analyzing script \"%.32s.ncs\".\n",
-//				e.what( ),
-//				e.specific( ),
-//				(unsigned long) e.pc( ),
-//				(unsigned long) e.stack_index( ),
-//				InFile.RefStr);
-//
-//			return false;
-//		}
-//		catch (std::exception &e)
-//		{
-//			TextOut->WriteText(
-//				"Error: (Verifier error): Exception '%s' analyzing script \"%.32s.ncs\".\n",
-//				e.what( ),
-//				OutBaseFile.c_str( ));
-//
-//			return false;
-//		}
-//	}
-
 	return true;
 }
 
-//NWACTION_TYPE
-//ConvertNscType(
-//	 NscType Type
-//	)
-///*++
-//
-//Routine Description:
-//
-//	This routine converts a compiler NscType to an analyzer NWACTION_TYPE.
-//
-//Arguments:
-//
-//	Type - Supplies the NscType-encoding type to convert.
-//
-//Return Value:
-//
-//	The routine returns the corresponding NWACTION_TYPE for the given NscType.
-//	If there was no matching conversion (i.e. a user defined type was in use),
-//	then an std::exception is raised.
-//
-//Environment:
-//
-//	User mode.
-//
-//--*/
-//{
-//	switch (Type)
-//	{
-//
-//	case NscType_Void:
-//		return ACTIONTYPE_VOID;
-//	case NscType_Integer:
-//		return ACTIONTYPE_INT;
-//	case NscType_Float:
-//		return ACTIONTYPE_FLOAT;
-//	case NscType_String:
-//		return ACTIONTYPE_STRING;
-//	case NscType_Object:
-//		return ACTIONTYPE_OBJECT;
-//	case NscType_Vector:
-//		return ACTIONTYPE_VECTOR;
-//	case NscType_Action:
-//		return ACTIONTYPE_ACTION;
-//	default:
-//		if ((Type >= NscType_Engine_0) && (Type < NscType_Engine_0 + 10))
-//			return (NWACTION_TYPE) (ACTIONTYPE_ENGINE_0 + (Type - NscType_Engine_0));
-//		else
-//			throw std::runtime_error( "Illegal NscType for action service handler." );
-//	}
-//}
 
 bool
 DisassembleScriptFile(
@@ -1295,16 +851,13 @@ Environment:
 	std::string                                 ScriptTempFile;
 	std::string                                 SymbolsTempFile;
 	FILE                                      * f;
-//	std::vector< NWACTION_DEFINITION >          ActionDefs;
 	std::list< NscPrototypeDefinition >         ActionPrototypes;
-//	std::list< std::vector< NWACTION_TYPE > >   ActionTypes;
-//	NWSCRIPT_ACTION                             ActionId;
 
 	if (!Quiet)
 	{
 		TextOut->WriteText(
-			"Diassembling: %.32s.NCS\n",
-			InFile.RefStr);
+			"Diassembling: %%s\n",
+			InFile);
 	}
 
 	//
@@ -1324,7 +877,7 @@ Environment:
 	if (f == nullptr)
 	{
 		TextOut->WriteText(
-			"Error: Unable to open disassembly file \"%s\".\n",
+			"Error: Unable to open disassembly file %%s.\n",
 			FileName.c_str( ));
 
 		return false;
@@ -1337,7 +890,7 @@ Environment:
 			fclose( f );
 
 			TextOut->WriteText(
-				"Error: Failed to write to disassembly file \"%s\".\n",
+				"Error: Failed to write to disassembly file %%s.\n",
 				FileName.c_str( ));
 
 			return false;
@@ -1345,54 +898,6 @@ Environment:
 	}
 
 	fclose( f );
-
-//	//
-//	// Build the action definition table for the static analysis phase.  The
-//	// table is generated dynamically based on the compiled nwscript.nss.
-//	//
-//
-//	for (ActionId = 0;
-//	     ;
-//	     ActionId += 1)
-//	{
-//		NWACTION_DEFINITION          ActionDef;
-//		NscPrototypeDefinition       ActionPrototype;
-//
-//		if (!Compiler.NscGetActionPrototype( (int) ActionId, ActionPrototype ))
-//			break;
-//
-//		ActionPrototypes.push_back( ActionPrototype );
-//
-//		ZeroMemory( &ActionDef, sizeof( ActionDef ) );
-//
-//		ActionDef.Name            = ActionPrototypes.back( ).Name.c_str( );
-//		ActionDef.ActionId        = ActionId;
-//		ActionDef.MinParameters   = ActionPrototype.MinParameters;
-//		ActionDef.NumParameters   = ActionPrototype.NumParameters;
-//		ActionDef.ReturnType      = ConvertNscType( ActionPrototype.ReturnType );
-//
-//		//
-//		// Convert parameter types over.
-//		//
-//
-//		ActionTypes.push_back( std::vector< NWACTION_TYPE >( ) );
-//		std::vector< NWACTION_TYPE > & ReturnTypes = ActionTypes.back( );
-//
-//		ReturnTypes.resize( ActionPrototype.ParameterTypes.size( ) );
-//
-//		for (size_t i = 0; i < ActionPrototype.ParameterTypes.size( ); i += 1)
-//		{
-//			ReturnTypes[ i ] = ConvertNscType(
-//				ActionPrototype.ParameterTypes[ i ] );
-//		}
-//
-//		if (!ReturnTypes.empty( ))
-//			ActionDef.ParameterTypes = &ReturnTypes[ 0 ];
-//		else
-//			ActionDef.ParameterTypes = nullptr;
-//
-//		ActionDefs.push_back( ActionDef );
-//	}
 
 	//
 	// Now attempt to raise the script to the high level IR and print the IR out
@@ -1411,7 +916,7 @@ Environment:
 	if (f == nullptr)
 	{
 		TextOut->WriteText(
-			"Error: Unable to open script temporary file \"%s\".\n",
+			"Error: Unable to open script temporary file %%s.\n",
 			FileName.c_str( ));
 
 		return false;
@@ -1424,7 +929,7 @@ Environment:
 			fclose( f );
 
 			TextOut->WriteText(
-				"Error: Failed to write to script temporary file \"%s\".\n",
+				"Error: Failed to write to script temporary file %%s.\n",
 				FileName.c_str( ));
 
 			return false;
@@ -1434,8 +939,6 @@ Environment:
 	ScriptTempFile = FileName;
 
 	fclose( f );
-
-	f = nullptr;
 
 	if (!DbgFileContents.empty( ))
 	{
@@ -1447,7 +950,7 @@ Environment:
 		if (f == nullptr)
 		{
 			TextOut->WriteText(
-				"Error: Unable to open symbols temporary file \"%s\".\n",
+				"Error: Unable to open symbols temporary file %%s.\n",
 				FileName.c_str( ));
 
 			return false;
@@ -1460,7 +963,7 @@ Environment:
 				fclose( f );
 
 				TextOut->WriteText(
-					"Error: Failed to write to symbols temporary file \"%s\".\n",
+					"Error: Failed to write to symbols temporary file %%s.\n",
 					FileName.c_str( ));
 
 				return false;
@@ -1471,177 +974,6 @@ Environment:
 
 		SymbolsTempFile = FileName;
 	}
-
-	f = nullptr;
-
-	//
-	// Generate unoptimized IR.
-	//
-
-//	try
-//	{
-//		//
-//		// Create a script reader over the compiled script, and hand it off to an
-//		// analyzer instance with the analyzer debug output rerouted to the .ir
-//		// file.
-//		//
-//
-//		NWScriptReader ScriptReader( ScriptTempFile.c_str( ) );
-//
-//		if (!SymbolsTempFile.empty( ))
-//			ScriptReader.LoadSymbols( SymbolsTempFile.c_str( ) );
-//
-//		FileName  = OutBaseFile;
-//		FileName += ".ir";
-//
-//		f = fopen( FileName.c_str( ), "wt" );
-//
-//		if (f == nullptr)
-//		{
-//			TextOut->WriteText(
-//				"Error: Unable to open IR file \"%s\".\n",
-//				FileName.c_str( ));
-//
-//			return false;
-//		}
-//
-//		//
-//		// Perform the analysis and generate the IR.
-//		//
-//
-//		WriteFileTextOut CaptureOut( f );
-//		NWScriptAnalyzer ScriptAnalyzer(
-//			&CaptureOut,
-//			(!ActionDefs.empty( )) ? &ActionDefs[ 0 ] : nullptr,
-//			(NWSCRIPT_ACTION) ActionDefs.size( ));
-//
-//		ScriptAnalyzer.Analyze(
-//			&ScriptReader,
-//			NWScriptAnalyzer::AF_NO_OPTIMIZATIONS );
-//
-//		ScriptAnalyzer.DisplayIR( );
-//
-//		fclose( f );
-//		f = nullptr;
-//
-//	}
-//	catch (NWScriptAnalyzer::script_error &e)
-//	{
-//		if (f != nullptr)
-//		{
-//			fclose( f );
-//
-//			f = nullptr;
-//		}
-//
-//		TextOut->WriteText(
-//			"Error: Analyzer exception '%s' ('%s') at PC=%08X, SP=%08X analyzing script \"%.32s.ncs\".\n",
-//			e.what( ),
-//			e.specific( ),
-//			(unsigned long) e.pc( ),
-//			(unsigned long) e.stack_index( ),
-//			InFile.RefStr);
-//
-//		return false;
-//	}
-//	catch (std::exception &e)
-//	{
-//		if (f != nullptr)
-//		{
-//			fclose( f );
-//
-//			f = nullptr;
-//		}
-//
-//		TextOut->WriteText(
-//			"Error: Exception '%s' analyzing script \"%.32s.ncs\".\n",
-//			e.what( ),
-//			InFile.RefStr);
-//
-//		return false;
-//	}
-
-//	try
-//	{
-//		//
-//		// Create a script reader over the compiled script, and hand it off to an
-//		// analyzer instance with the analyzer debug output rerouted to the .ir
-//		// file.
-//		//
-//
-//		NWScriptReader ScriptReader( ScriptTempFile.c_str( ) );
-//
-//		if (!SymbolsTempFile.empty( ))
-//			ScriptReader.LoadSymbols( SymbolsTempFile.c_str( ) );
-//
-//		FileName  = OutBaseFile;
-//		FileName += ".ir-opt";
-//
-//		f = fopen( FileName.c_str( ), "wt" );
-//
-//		if (f == nullptr)
-//		{
-//			TextOut->WriteText(
-//				"Error: Unable to open IR file \"%s\".\n",
-//				FileName.c_str( ));
-//
-//			return false;
-//		}
-//
-//		//
-//		// Perform the analysis and generate the IR.
-//		//
-//
-//		WriteFileTextOut CaptureOut( f );
-//		NWScriptAnalyzer ScriptAnalyzer(
-//			&CaptureOut,
-//			(!ActionDefs.empty( )) ? &ActionDefs[ 0 ] : nullptr,
-//			(NWSCRIPT_ACTION) ActionDefs.size( ));
-//
-//		ScriptAnalyzer.Analyze(
-//			&ScriptReader,
-//			0 );
-//
-//		ScriptAnalyzer.DisplayIR( );
-//
-//		fclose( f );
-//		f = nullptr;
-//	}
-//	catch (NWScriptAnalyzer::script_error &e)
-//	{
-//		if (f != nullptr)
-//		{
-//			fclose( f );
-//
-//			f = nullptr;
-//		}
-//
-//		TextOut->WriteText(
-//			"Error: Analyzer exception '%s' ('%s') at PC=%08X, SP=%08X analyzing script \"%.32s.ncs\".\n",
-//			e.what( ),
-//			e.specific( ),
-//			(unsigned long) e.pc( ),
-//			(unsigned long) e.stack_index( ),
-//			InFile.RefStr);
-//
-//		return false;
-//	}
-//	catch (std::exception &e)
-//	{
-//		if (f != nullptr)
-//		{
-//			fclose( f );
-//
-//			f = nullptr;
-//		}
-//
-//		TextOut->WriteText(
-//			"Error: Exception '%s' analyzing script \"%.32s.ncs\".\n",
-//			e.what( ),
-//			InFile.RefStr);
-//
-//		return false;
-//	}
 
 	return true;
 }
@@ -1738,7 +1070,7 @@ Environment:
 		InFileContents))
 	{
 		TextOut->WriteText(
-			"Error: Unable to read input file '%s'.\n", InFile.c_str( ) );
+			"Error: Unable to read input file '%%s'.\n", InFile.c_str() );
 
 		return false;
 	}
@@ -1916,7 +1248,7 @@ Environment:
 		Extension))
 	{
 		TextOut->WriteText(
-			"Error: Malformed input wildcard path \"%s\".\n", InFile.c_str( ));
+			"Error: Malformed input wildcard path %%s.\n", InFile.c_str( ));
 
 		return false;
 	}
@@ -1943,7 +1275,7 @@ Environment:
 	if (FindHandle == -1)
 	{
 		TextOut->WriteText(
-			"Error: No matching files for input wildcard path \"%s\".\n",
+			"Error: No matching files for input wildcard path %%s.\n",
 			InFile.c_str( ));
 
 		return false;
@@ -1997,8 +1329,8 @@ Environment:
 		if (!ThisStatus)
 		{
 			TextOut->WriteText(
-				"Error: Failed to process file \"%s\".\n",
-				MatchedFile.c_str( ));
+				"Error: Failed to process file %%s.\n",
+				MatchedFile.c_str());
 
 			Status = false;
 
@@ -2015,7 +1347,7 @@ Environment:
 	_findclose( FindHandle );
 
 	if (Errors)
-		TextOut->WriteText( "%lu error(s); see above for context.\n", Errors );
+		TextOut->WriteText( "%%lu error(s); see above for context.\n", Errors );
 
 	return Status;
 }
@@ -2213,10 +1545,6 @@ Environment:
 					switch (towlower( (wint_t) (unsigned) Switch ))
 					{
 
-//					case '1':
-//						Erf16 = true;
-//						break;
-
 					case 'a':
 						VerifyCode = true;
 						break;
@@ -2308,31 +1636,6 @@ Environment:
 						LoadResources = true;
 						break;
 
-//					case 'm':
-//						{
-//							LoadResources = true;
-//
-//							if (i + 1 >= argc)
-//							{
-//								wprintf( L"Error: Malformed arguments.\n" );
-//								Error = true;
-//								break;
-//							}
-//
-//                            ModuleName = argv[ i + 1 ];
-//
-//							if (ModuleName.empty( ))
-//							{
-//								printf(
-//									"Error: Module resource name must not be empty.\n");
-//								Error = true;
-//								break;
-//							}
-//
-//							i += 1;
-//						};
-//						break;
-
 					case 'n':
 						{
 							if (i + 1 >= argc)
@@ -2366,21 +1669,6 @@ Environment:
 					case 'q':
 						Quiet = true;
 						break;
-
-//					case 'r':
-//						{
-//							if (i + 1 >= argc)
-//							{
-//								printf( "Error: Malformed arguments.\n" );
-//								Error = true;
-//								break;
-//							}
-//
-//                            CustomModPath = argv[ i + 1 ];
-//
-//							i += 1;
-//						}
-//						break;
 
 					case 'v':
 						{
@@ -2528,16 +1816,16 @@ Environment:
 	} while (!Error) ;
 
 
-	if (!Quiet)
-	{
-		printf(
-			"NWNScriptCompiler - built %s %s\n"
-                    NWN2DEV_COPYRIGHT_STR ".\n"
-			"Portions copyright (C) 2002-2003, Edward T. Smith.\n"
-			"Portions copyright (C) 2003, The Open Knights Consortium.\n",
-			__DATE__,
-			__TIME__);
-	}
+//	if (!Quiet)
+//	{
+//		printf(
+//			"NWNScriptCompiler - built %s %s\n"
+//                    NWN2DEV_COPYRIGHT_STR ".\n"
+//			"Portions copyright (C) 2002-2003, Edward T. Smith.\n"
+//			"Portions copyright (C) 2003, The Open Knights Consortium.\n",
+//			__DATE__,
+//			__TIME__);
+//	}
 
 	if ((Error) || (InFiles.empty( )))
 	{
@@ -2552,18 +1840,9 @@ Environment:
 			"  homedir - Per-user NWN home directory (i.e. Documents\\Neverwinter Nights).\n"
 			"  pathspec - Semicolon separated list of directories to search for\n"
 			"             additional includes.\n"
-//			"  resref - Resource name of module to load (without extension).\n"
-//			"           Note that loading a module is potentially slow.\n"
 			"  installdir - NWN install directory.\n"
-//			"  modpath - Supplies the full path to the .mod (or directory) that\n"
-//			"            contains the module.ifo for the module to load.  This\n"
-//			"            option overrides the [-r resref] option.\n"
 			"  errprefix - Prefix string to prepend to compiler errors (replacing\n"
 			"              the default of \"Error\").\n"
-//			"  -1 - Assume NWN1-style module and KEY/BIF resources instead of\n"
-//			"       NWN2-style module and ZIP resources.\n"
-//			"  -a - Analyze generated code and verify that it is consistent\n"
-//			"       (increases compilation time).\n"
 			"  -c - Compile the script (default, overrides -d).\n"
 			"  -d - Disassemble the script (overrides -c).\n"
 			"  -e - Enable non-BioWare extensions.\n"
@@ -2593,7 +1872,7 @@ Environment:
 	catch (std::runtime_error &e)
 	{
 		g_TextOut.WriteText(
-			"Failed to initialize resource manager: '%s'\n",
+			"Failed to initialize resource manager: '%%s'\n",
 			e.what( ) );
 
 		if (g_Log != nullptr)
@@ -2608,30 +1887,17 @@ Environment:
 	if (LoadResources)
 	{
 		//
-		// If we're to load module resources, then do so now.
+		// If we're to load game resources, then do so now.
 		//
 
-		if (!Quiet)
-		{
-//			if (ModuleName.empty( ))
-//			{
-				g_TextOut.WriteText(
-					"Loading base game resources...\n");
-//			}
-//			else
-//			{
-//				g_TextOut.WriteText(
-//					"Loading resources for module '%s'...\n",
-//					ModuleName.c_str( ));
-//			}
-		}
+//		if (!Quiet)
+//		{
+//            g_TextOut.WriteText("Loading base game resources...\n");
+//		}
 
 		if (InstallDir.empty( ))
 		{
-//			if (!Erf16)
-//				InstallDir = GetNwn2InstallPath( );
-//			else
-				InstallDir = GetNwn1InstallPath( );
+            InstallDir = GetNwn1InstallPath( );
 		}
 
 		if (HomeDir.empty( ))
@@ -2729,7 +1995,7 @@ Environment:
 					0))
 				{
 					g_TextOut.WriteText(
-						"Error: Invalid path: \"%s\".\n",
+						"Error: Invalid path: \"%%s\".\n",
 						it->c_str( ));
 
 					ReturnCode = -1;
@@ -2781,13 +2047,13 @@ Environment:
 	if (!Quiet)
 	{
 		g_TextOut.WriteText(
-			"Total Execution time = %lums\n",
+			"Total Execution time = %%lums\n",
 			GetTickCount( ) - StartTime);
 	}
 #endif
 
 	if (Errors > 1)
-		g_TextOut.WriteText( "%lu error(s) processing input files.\n", Errors );
+		g_TextOut.WriteText( "%%lu error(s) processing input files.\n", Errors );
 
 	if (g_Log != nullptr)
 	{

@@ -469,7 +469,7 @@ NscResult NscCompileScript (CNwnLoader *pLoader, const char *pszName,
 	if (pauchData == NULL)
 	{
 		if (pErrorOutput)
-			pErrorOutput ->WriteText ("Unable to load resource \"%s\"\n", pszName);
+			pErrorOutput ->WriteText ("Unable to load resource %%s\n", pszName);
 		return NscResult_Failure;
 	}
 
@@ -646,7 +646,7 @@ NscCompiler::NscCompileScript (
 	{
 		if (ErrorOutput != NULL)
 		{
-			ErrorOutput ->WriteText ("Failed to load resource %s.ncs.\n",
+			ErrorOutput ->WriteText ("Failed to load resource %%s.ncs.\n",
 				m_ResourceManager .StrFromResRef (ScriptName) .c_str ());
 		}
 
@@ -693,7 +693,7 @@ NscCompiler::NscCompileScript (
 
 		if (ErrorOutput != NULL)
 		{
-			ErrorOutput ->WriteText ("Exception compiling '%s.ncs': '%s'\n",
+			ErrorOutput ->WriteText ("Exception compiling '%%s.ncs': '%%s'\n",
 				m_ResourceManager .StrFromResRef (ScriptName) .c_str (),
 				e.what ());
 		}
@@ -875,7 +875,7 @@ NscCompiler::NscCompileScript (
 	{
 		if (ErrorOutput != NULL)
 		{
-			ErrorOutput ->WriteText ("Exception compiling '%s.ncs': '%s'\n",
+			ErrorOutput ->WriteText ("Exception compiling '%%s.ncs': '%%s'\n",
 				m_ResourceManager .StrFromResRef (ScriptName) .c_str (),
 				e.what ());
 		}
@@ -1244,7 +1244,7 @@ NscCompiler::LoadResource (
 
 			if ((m_ShowIncludes) && (m_ErrorOutput != NULL))
 			{
-				m_ErrorOutput ->WriteText ("ShowIncludes: Handled resource %s.%s from %s.\n",
+				m_ErrorOutput ->WriteText ("ShowIncludes: Handled resource %%s.%%s from %%s.\n",
 					pszName,
 					m_ResourceManager .ResTypeToExt (nResType),
 					it ->c_str ());
@@ -1318,7 +1318,7 @@ NscCompiler::LoadResource (
 
 		if ((m_ShowIncludes) && (m_ErrorOutput != NULL))
 		{
-			m_ErrorOutput ->WriteText ("ShowIncludes: Handled resource %s.%s from ResLoadFile.\n",
+			m_ErrorOutput ->WriteText ("ShowIncludes: Handled resource %%s.%%s from ResLoadFile.\n",
 				pszName,
 				m_ResourceManager .ResTypeToExt (nResType));
 		}
@@ -1410,7 +1410,7 @@ NscCompiler::LoadResource (
 			std::string AccessorName;
 
 			m_ResourceManager .GetResourceAccessorName (Handle, AccessorName);
-			m_ErrorOutput ->WriteText ("ShowIncludes: Handled resource %s.%s from %s.\n",
+			m_ErrorOutput ->WriteText ("ShowIncludes: Handled resource %%s.%%s from %%s.\n",
 				pszName,
 				m_ResourceManager .ResTypeToExt (nResType),
 				AccessorName .c_str ());
