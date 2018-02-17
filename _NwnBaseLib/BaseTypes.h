@@ -24,6 +24,10 @@ Abstract:
 #pragma once
 #endif
 
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
 namespace NWN
 {
 	//
