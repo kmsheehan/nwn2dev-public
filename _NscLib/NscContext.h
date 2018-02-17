@@ -1558,7 +1558,7 @@ protected:
 //          printf(error);
             
             if (m_pErrorStream)
-					 m_pErrorStream ->WriteText ("%%s%%s\n", prefix, error);
+					 m_pErrorStream ->WriteText ("%s%s\n", prefix, error);
             
 //          printf ("\n");
 #else

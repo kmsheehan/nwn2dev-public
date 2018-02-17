@@ -548,7 +548,7 @@ Environment:
 		Extension))
 	{
 		TextOut->WriteText(
-			"Error: Malformed file pathname \"%%s\".\n", InFile.c_str( ));
+			"Error: Malformed file pathname \"%s\".\n", InFile.c_str( ));
 
 		return false;
 	}
@@ -672,7 +672,7 @@ Environment:
 
     if (!Quiet)
 	{
-		TextOut->WriteText("Compiling: %%s\n",InFile);
+		TextOut->WriteText("Compiling: %s\n",InFile);
 	}
 
 	//
@@ -704,7 +704,7 @@ Environment:
 		if (!Quiet)
 		{
 			TextOut->WriteText(
-				"%%s.nss is an include file, ignored.\n",
+				"%s.nss is an include file, ignored.\n",
 				InFile);
 		}
 
@@ -733,7 +733,7 @@ Environment:
 	if (f == nullptr)
 	{
 		TextOut->WriteText(
-			"Error: Unable to open output file %%s.\n",
+			"Error: Unable to open output file %s.\n",
 			FileName.c_str( ));
 
 		return false;
@@ -746,7 +746,7 @@ Environment:
 			fclose( f );
 
 			TextOut->WriteText(
-				"Error: Failed to write to output file %%s.\n",
+				"Error: Failed to write to output file %s.\n",
 				FileName.c_str( ));
 
 			return false;
@@ -765,7 +765,7 @@ Environment:
 		if (f == nullptr)
 		{
 			TextOut->WriteText(
-				"Error: Failed to open debug symbols file %%s.\n",
+				"Error: Failed to open debug symbols file %s.\n",
 				FileName.c_str( ));
 
 			return false;
@@ -778,7 +778,7 @@ Environment:
 				fclose( f );
 
 				TextOut->WriteText(
-					"Error: Failed to write to debug symbols file %%s.\n",
+					"Error: Failed to write to debug symbols file %s.\n",
 					FileName.c_str( ));
 
 				return false;
@@ -856,7 +856,7 @@ Environment:
 	if (!Quiet)
 	{
 		TextOut->WriteText(
-			"Diassembling: %%s\n",
+			"Diassembling: %s\n",
 			InFile);
 	}
 
@@ -877,7 +877,7 @@ Environment:
 	if (f == nullptr)
 	{
 		TextOut->WriteText(
-			"Error: Unable to open disassembly file %%s.\n",
+			"Error: Unable to open disassembly file %s.\n",
 			FileName.c_str( ));
 
 		return false;
@@ -890,7 +890,7 @@ Environment:
 			fclose( f );
 
 			TextOut->WriteText(
-				"Error: Failed to write to disassembly file %%s.\n",
+				"Error: Failed to write to disassembly file %s.\n",
 				FileName.c_str( ));
 
 			return false;
@@ -916,7 +916,7 @@ Environment:
 	if (f == nullptr)
 	{
 		TextOut->WriteText(
-			"Error: Unable to open script temporary file %%s.\n",
+			"Error: Unable to open script temporary file %s.\n",
 			FileName.c_str( ));
 
 		return false;
@@ -929,7 +929,7 @@ Environment:
 			fclose( f );
 
 			TextOut->WriteText(
-				"Error: Failed to write to script temporary file %%s.\n",
+				"Error: Failed to write to script temporary file %s.\n",
 				FileName.c_str( ));
 
 			return false;
@@ -950,7 +950,7 @@ Environment:
 		if (f == nullptr)
 		{
 			TextOut->WriteText(
-				"Error: Unable to open symbols temporary file %%s.\n",
+				"Error: Unable to open symbols temporary file %s.\n",
 				FileName.c_str( ));
 
 			return false;
@@ -963,7 +963,7 @@ Environment:
 				fclose( f );
 
 				TextOut->WriteText(
-					"Error: Failed to write to symbols temporary file %%s.\n",
+					"Error: Failed to write to symbols temporary file %s.\n",
 					FileName.c_str( ));
 
 				return false;
@@ -1070,7 +1070,7 @@ Environment:
 		InFileContents))
 	{
 		TextOut->WriteText(
-			"Error: Unable to read input file '%%s'.\n", InFile.c_str() );
+			"Error: Unable to read input file '%s'.\n", InFile.c_str() );
 
 		return false;
 	}
@@ -1248,7 +1248,7 @@ Environment:
 		Extension))
 	{
 		TextOut->WriteText(
-			"Error: Malformed input wildcard path %%s.\n", InFile.c_str( ));
+			"Error: Malformed input wildcard path %s.\n", InFile.c_str( ));
 
 		return false;
 	}
@@ -1275,7 +1275,7 @@ Environment:
 	if (FindHandle == -1)
 	{
 		TextOut->WriteText(
-			"Error: No matching files for input wildcard path %%s.\n",
+			"Error: No matching files for input wildcard path %s.\n",
 			InFile.c_str( ));
 
 		return false;
@@ -1329,7 +1329,7 @@ Environment:
 		if (!ThisStatus)
 		{
 			TextOut->WriteText(
-				"Error: Failed to process file %%s.\n",
+				"Error: Failed to process file %s.\n",
 				MatchedFile.c_str());
 
 			Status = false;
@@ -1347,7 +1347,7 @@ Environment:
 	_findclose( FindHandle );
 
 	if (Errors)
-		TextOut->WriteText( "%%lu error(s); see above for context.\n", Errors );
+		TextOut->WriteText( "%lu error(s); see above for context.\n", Errors );
 
 	return Status;
 }
@@ -1569,10 +1569,6 @@ Environment:
 						}
 						break;
 
-					case 'c':
-						Compile = true;
-						break;
-
 					case 'd':
 						Compile = false;
 						break;
@@ -1670,7 +1666,22 @@ Environment:
 						Quiet = true;
 						break;
 
-					case 'v':
+                    case 'r':
+                        {
+                            if (i + 1 >= argc)
+                            {
+                                printf( "Error: Malformed arguments.\n" );
+                                Error = true;
+                                break;
+                            }
+
+                            OutFile = argv[ i + 1 ];
+
+                            i += 1;
+                        }
+                            break;
+
+                    case 'v':
 						{
 							CompilerVersion = 0;
 
@@ -1756,31 +1767,24 @@ Environment:
 
                 Ansi = argv [i];
 
-				//
-				// If we're running in batch mode, all filenames just go onto the
-				// input file list.
-				//
+                InFiles.push_back( Ansi );
 
-				if (!BatchOutDir.empty( ))
-				{
-					InFiles.push_back( Ansi );
-					continue;
-				}
 
-				if (InFiles.empty( ))
-				{
-					InFiles.push_back( Ansi );
-				}
-				else if (OutFile.empty( ))
-				{
-					OutFile = Ansi;
-				}
-				else
-				{
-					printf( "Error: Too many file arguments.\n" );
-					Error = true;
-					break;
-				}
+//				//
+//				// If we're running in batch mode, all filenames just go onto the
+//				// input file list.
+//				//
+//
+//				if (!BatchOutDir.empty( ))
+//				{
+//					InFiles.push_back( Ansi );
+//					continue;
+//				}
+//
+//				if (InFiles.empty( ))
+//				{
+//					InFiles.push_back( Ansi );
+//				}
 			}
 		}
 
@@ -1831,10 +1835,10 @@ Environment:
 	{
 		printf(
 			"Usage:\n"
-			"NWNScriptCompiler [-acdegjkloq] [-b batchoutdir] [-h homedir]\n"
+			"NWNScriptCompiler [-adegjklorqy] [-b batchoutdir] [-h homedir]\n"
 			"                  [[-i pathspec] ...] [-n installdir]\n"
-			"                  [-v#] [-x errprefix] [-y]\n"
-			"                  infile [outfile|infiles]\n"
+			"                  [-v#] [-x errprefix] [-r outfile]\n"
+			"                  infile [infile...]\n"
 			"  batchoutdir - Supplies the location at which batch mode places\n"
 			"                output files and enables multiple input filenames.\n"
 			"  homedir - Per-user NWN home directory (i.e. Documents\\Neverwinter Nights).\n"
@@ -1843,7 +1847,6 @@ Environment:
 			"  installdir - NWN install directory.\n"
 			"  errprefix - Prefix string to prepend to compiler errors (replacing\n"
 			"              the default of \"Error\").\n"
-			"  -c - Compile the script (default, overrides -d).\n"
 			"  -d - Disassemble the script (overrides -c).\n"
 			"  -e - Enable non-BioWare extensions.\n"
 			"  -g - Enable generation of .ndb debug symbols file.\n"
@@ -1853,6 +1856,7 @@ Environment:
 			"  -o - Optimize the compiled script.\n"
 			"  -p - Dump internal PCode for compiled script contributions.\n"
 			"  -q - Silence most messages.\n"
+            "  -r - Filename for output file.\n"
 			"  -vx.xx - Set the version of the compiler.\n"
 			"  -y - Continue processing input files even on error.\n"
 			);
@@ -1872,7 +1876,7 @@ Environment:
 	catch (std::runtime_error &e)
 	{
 		g_TextOut.WriteText(
-			"Failed to initialize resource manager: '%%s'\n",
+			"Failed to initialize resource manager: '%s'\n",
 			e.what( ) );
 
 		if (g_Log != nullptr)
@@ -1995,7 +1999,7 @@ Environment:
 					0))
 				{
 					g_TextOut.WriteText(
-						"Error: Invalid path: \"%%s\".\n",
+						"Error: Invalid path: \"%s\".\n",
 						it->c_str( ));
 
 					ReturnCode = -1;
@@ -2047,13 +2051,13 @@ Environment:
 	if (!Quiet)
 	{
 		g_TextOut.WriteText(
-			"Total Execution time = %%lums\n",
+			"Total Execution time = %lums\n",
 			GetTickCount( ) - StartTime);
 	}
 #endif
 
 	if (Errors > 1)
-		g_TextOut.WriteText( "%%lu error(s) processing input files.\n", Errors );
+		g_TextOut.WriteText( "%lu error(s) processing input files.\n", Errors );
 
 	if (g_Log != nullptr)
 	{
