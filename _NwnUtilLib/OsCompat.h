@@ -9,16 +9,19 @@
 #include <string.h>
 
 #if !defined(_WIN32) && !defined(_WIN64)
-typedef unsigned long DWORD;
-typedef unsigned short WORD;
-typedef int BOOL;
-typedef long LONG;
-typedef unsigned char BYTE;
+typedef int8_t CHAR;
+typedef uint8_t UCHAR;
+typedef uint16_t USHORT;
+typedef uint16_t WORD;
+typedef int16_t BOOL;
+
+
+typedef uint32_t DWORD;
+typedef int32_t LONG;
+typedef uint8_t BYTE;
 typedef uint64_t ULONG64;
-typedef unsigned long ULONG;
-typedef unsigned char UCHAR;
-typedef unsigned short USHORT;
-typedef char CHAR;
+typedef uint32_t ULONG;
+
 //typedef ULONG64 FileHandle;
 //typedef ULONG64 FileId;
 //static const FileHandle INVALID_FILE = 0;
@@ -26,13 +29,13 @@ typedef char CHAR;
 #if defined(_WIN64)
 typedef __int64 LONG_PTR;
 #else
-typedef long LONG_PTR;
+typedef int32_t LONG_PTR;
 #endif
 
 #if defined(_WIN64)
 typedef unsigned __int64 ULONG_PTR;
 #else
-typedef unsigned long ULONG_PTR;
+typedef uint32_t ULONG_PTR;
 #endif
 
 #if !defined(_M_IX86)

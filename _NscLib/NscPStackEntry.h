@@ -311,10 +311,8 @@ public:
 	int GetInteger () const
 	{
 		assert (m_nType == NscType_Integer);
-		assert (m_nDataSize == sizeof (NscPCodeConstantInteger));
+//		assert (m_nDataSize == sizeof (NscPCodeConstantInteger)); // Negative numbers in case statements have a size of 28
 		NscPCodeConstantInteger *p = (NscPCodeConstantInteger *) m_pauchData;
-//        printf(" --> DBG: [%d][%d][%d]",p->lValue, m_nDataSize, sizeof(NscPCodeConstantInteger));
-//		assert (m_nDataSize == sizeof (NscPCodeConstantInteger));
 		assert (p ->nOpCode == NscPCode_Constant);
 		assert (p ->nType == NscType_Integer);
 		return p ->lValue;

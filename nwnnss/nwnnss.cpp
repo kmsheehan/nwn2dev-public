@@ -276,7 +276,7 @@ Environment:
 
 --*/
 {
-    CHAR        DocumentsPath[ _MAX_PATH ];
+    std::string DocumentsPath;
     std::string HomePath;
 
     HomePath  = DocumentsPath;

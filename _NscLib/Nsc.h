@@ -53,8 +53,6 @@
 #include "NwnStreams.h"
 #include "NwnLoader.h"
 
-#define YYDEBUG 1
-
 //-----------------------------------------------------------------------------
 //
 // Forward definitions
