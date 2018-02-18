@@ -47,9 +47,13 @@
 //
 //-----------------------------------------------------------------------------
 
-#include "../_NwnDataLib/NWNDataLib.h"
+#include "NscCompat.h"
+#include "NwnDefines.h"
+//#include "../_NwnDataLib/NWNDataLib.h"
 #include "NwnStreams.h"
 #include "NwnLoader.h"
+
+#define YYDEBUG 1
 
 //-----------------------------------------------------------------------------
 //

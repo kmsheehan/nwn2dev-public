@@ -59,8 +59,7 @@
 #include "NscPStackEntry.h"
 #include "NscSymbolTable.h"
 
-#define YYSTYPE CNscPStackEntry *
-#include "NscParser.h"
+#include "NscParser.hpp"
 
 #if defined(__linux__)
 #include <stdarg.h>
@@ -87,6 +86,7 @@ class NscCompiler;
 // Class definition
 //
 //-----------------------------------------------------------------------------
+
 
 struct NscCompilerState
 {

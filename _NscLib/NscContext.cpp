@@ -65,26 +65,26 @@ static const char *g_astrNscIntrinsicNames [NscIntrinsic__NumIntrinsics+1] =
 };
 
 
-#if _NSCCONTEXT_USE_BISONPP
-void yyerror (char *s);
-
-class Myyyparser : public yyparser
-{
-
-public:
-
-	Myyyparser (CNscContext & ctx) : m_ctx (ctx) {}
-	virtual ~Myyyparser () {}
-
-	virtual int yylex () { return m_ctx.yylex (&yylval); }
-	virtual void yyerror (const char *message) { m_ctx.yyerror (message); }
-
-private:
-
-	CNscContext & m_ctx;
-
-};
-#endif
+//#if _NSCCONTEXT_USE_BISONPP
+//void yyerror (char *s);
+//
+//class Myyyparser : public yyparser
+//{
+//
+//public:
+//
+//	Myyyparser (CNscContext & ctx) : m_ctx (ctx) {}
+//	virtual ~Myyyparser () {}
+//
+//	virtual int yylex () { return m_ctx.yylex (reinterpret_cast<CNscPStackEntry **>(&yylval)); }
+//	virtual void yyerror (const char *message) { m_ctx.yyerror (message); }
+//
+//private:
+//
+//	CNscContext & m_ctx;
+//
+//};
+//#endif
 
 
 //-----------------------------------------------------------------------------
@@ -193,7 +193,9 @@ CNscContext::~CNscContext ()
 int CNscContext::parse ()
 {
 #if _NSCCONTEXT_USE_BISONPP
-	return Myyyparser (*this).yyparse();
+	yy::parser parser(*this);
+	return parser.parse();
+//	return Myyyparser (*this).yyparse();
 #else
     yy::parser parser(*this);
 #ifdef _DEBUG

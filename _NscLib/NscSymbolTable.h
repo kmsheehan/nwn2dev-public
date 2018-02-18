@@ -59,6 +59,8 @@
 //
 //-----------------------------------------------------------------------------
 
+#include "NwnDefines.h"
+
 class CNscSymbolTable
 {
 // @access Constructors and destructors

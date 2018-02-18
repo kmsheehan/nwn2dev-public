@@ -50,7 +50,8 @@
 #include <cassert>
 #include <cmath>
 #include "NwnDoubleLinkList.h"
-#include "NscSymbolTable.h"
+#include "NwnDefines.h"
+//#include "NscSymbolTable.h"
 
 //-----------------------------------------------------------------------------
 //
@@ -312,6 +313,8 @@ public:
 		assert (m_nType == NscType_Integer);
 		assert (m_nDataSize == sizeof (NscPCodeConstantInteger));
 		NscPCodeConstantInteger *p = (NscPCodeConstantInteger *) m_pauchData;
+//        printf(" --> DBG: [%d][%d][%d]",p->lValue, m_nDataSize, sizeof(NscPCodeConstantInteger));
+//		assert (m_nDataSize == sizeof (NscPCodeConstantInteger));
 		assert (p ->nOpCode == NscPCode_Constant);
 		assert (p ->nType == NscType_Integer);
 		return p ->lValue;
