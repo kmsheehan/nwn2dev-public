@@ -24,6 +24,7 @@ Abstract:
 #include "../_NwnDataLib/ResourceManager.h"
 #include "../_NscLib/Nsc.h"
 #include "../_NwnUtilLib/findfirst.h"
+#include "../_NwnUtilLib/version.h"
 
 #if defined(__linux__)
 #include <stdarg.h>
@@ -1623,7 +1624,7 @@ Environment:
 
                             const char *version = argv[i + 1];
 
-                            while (version != '\0') {
+                            while (*version != '\0') {
                                 char Digit = *version++;
 
                                 if (isdigit((wint_t) (unsigned) Digit)) {
@@ -1784,10 +1785,12 @@ Environment:
         );
         if (Version) {
             printf(
-			"NWNScriptCompiler - built %s %s\n"
-                    NWN2DEV_COPYRIGHT_STR ".\n"
-			"Portions copyright (C) 2002-2003, Edward T. Smith.\n"
-			"Portions copyright (C) 2003, The Open Knights Consortium.\n",
+			"nwnsc version %s - built %s %s\n\n"
+            "  Portions Copyright (C) 2008-2015 Skywing.\n"
+			"  Portions copyright (C) 2002-2003, Edward T. Smith.\n"
+			"  Portions copyright (C) 2003, The Open Knights Consortium.\n"
+            "  Adapted for Neverwinter Nights Enhanced Edition and cross platform use by: Glorwinger and Jakkn\n",
+            gGIT_VERSION_SHORT.c_str(),
 			__DATE__,
 			__TIME__);
         }

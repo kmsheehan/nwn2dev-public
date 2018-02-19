@@ -7,5 +7,6 @@ add_library(nwnutillib
         ProjGlobalDefs
         Ref
         spec
+        version
         VersionConstants
 )

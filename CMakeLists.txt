@@ -7,6 +7,26 @@ if(NOT CMAKE_CXX_STANDARD OR CMAKE_CXX_STANDARD LESS 11)
     set(CMAKE_CXX_STANDARD 11)
 endif()
 
+# Appends the cmake/modules path to MAKE_MODULE_PATH variable.
+set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules ${CMAKE_MODULE_PATH})
+
+#
+# Make a version file containing the current version from git.
+#
+include(GetGitRevisionDescription)
+git_describe(VERSION --tags --dirty=-dirty)
+
+#parse the version information into pieces.
+string(REGEX REPLACE "^v([0-9]+)\\..*" "\\1" VERSION_MAJOR "${VERSION}")
+string(REGEX REPLACE "^v[0-9]+\\.([0-9]+).*" "\\1" VERSION_MINOR "${VERSION}")
+string(REGEX REPLACE "^v[0-9]+\\.[0-9]+\\.([0-9]+).*" "\\1" VERSION_PATCH "${VERSION}")
+string(REGEX REPLACE "^v[0-9]+\\.[0-9]+\\.[0-9]+(.*)" "\\1" VERSION_SHA1 "${VERSION}")
+set(VERSION_SHORT "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
+
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules/version.cpp.in
+		${CMAKE_CURRENT_BINARY_DIR}/version.cpp)
+set(version_file "${CMAKE_CURRENT_BINARY_DIR}/version.cpp")
+
 if (APPLE)
     set(CMAKE_MACOSX_RPATH 1)
 endif()
@@ -52,5 +72,5 @@ add_subdirectory(_NwnDataLib)
 #add_subdirectory(_NwnScriptLib)
 add_subdirectory(_NwnUtilLib)
 add_subdirectory(_NscLib)
-add_subdirectory(nwnnss)
+add_subdirectory(nwnsc)
 #add_subdirectory(nwnmdl)

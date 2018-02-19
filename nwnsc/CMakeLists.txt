@@ -1,2 +1,4 @@
-add_executable(nwnnss nwnnss.cpp)
-target_link_libraries(nwnnss nsclib nwndatalib nwnbaselib nwnutillib)
+
+
+add_executable(nwnsc nwnsc.cpp)
+target_link_libraries(nwnsc nsclib nwndatalib nwnbaselib nwnutillib ${version_file})

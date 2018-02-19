@@ -11,6 +11,9 @@ cmake_install.cmake
 [Bb]in/
 [Oo]bj/
 
+# Generated Version file
+version.cpp
+
 # mstest test results
 TestResults
 
