@@ -55,7 +55,7 @@ Environment:
     HANDLE        File;
     unsigned long FileSize;
 
-#if defined(_WIN32) && defined(_WIN64)
+#if defined(_WINDOWS)
 
 	File = CreateFileA(
 		FileName.c_str( ),

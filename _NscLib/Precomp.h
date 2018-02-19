@@ -24,10 +24,10 @@ Abstract:
 #define _CRT_SECURE_NO_DEPRECATE_GLOBALS
 #define STRSAFE_NO_DEPRECATE
 
-#if defined(_WIN32) && defined(_WIN64)
+#if defined(_WINDOWS)
 
-#include <winsock2.h>
-#include <windows.h>
+//#include <winsock2.h>
+//#include <windows.h>
 #else
 #include <unistd.h>
 #endif
@@ -43,17 +43,13 @@ Abstract:
 #include <vector>
 #include <map>
 
-#if defined(_WIN32) && defined(_WIN64)
-#include <hash_map>
-#endif
-
 #include <sstream>
 
 #ifdef ENCRYPT
 #include <protect.h>
 #endif
 
-#if defined(_WIN32) && defined(_WIN64)
+#if defined(_WINDOWS)
 #include <mbctype.h>
 #include <io.h>
 

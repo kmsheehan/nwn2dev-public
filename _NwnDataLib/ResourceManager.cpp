@@ -419,7 +419,7 @@ Environment:
 //	ResourceEntryMap::const_iterator eit;
 //	std::string                      LookupName;
 //
-//#if defined(_WIN32) && defined(_WIN64)
+//#if defined(_WINDOWS)
 //	LookupName  = _itoa( (int) Type, Msg, 10 );
 //#else
 //	snprintf(Msg, sizeof(Msg),"%d",Type);

@@ -22,9 +22,7 @@ namespace swutil
 		 LONG_PTR volatile * Addend
 		)
 	{
-#ifdef _WIN64
-		return InterlockedIncrement64( Addend );
-#elseif _WIN32
+#ifdef _WINDOWS
 		return InterlockedIncrement( Addend );
 #else
 		__sync_add_and_fetch(Addend,1);
@@ -37,9 +35,7 @@ namespace swutil
 		 LONG_PTR volatile * Addend
 		)
 	{
-#ifdef _WIN64
-		return InterlockedDecrement64( Addend );
-#elseif _WIN32
+#ifdef _WINDOWS
 		return InterlockedIncrement( Addend );
 #else
 		__sync_add_and_fetch(Addend,1);
@@ -103,10 +99,6 @@ namespace swutil
 		{
 			if (!InterlockedAddReference( &m_References ))
 			{
-#if defined(_WIN32) && defined(_WIN64)
-				__debugbreak( );
-#endif
-
 				return false;
 			}
 
@@ -169,7 +161,7 @@ namespace swutil
 
 				PrevCopy  = PrevValue;
 
-#if defined(_WIN32) && defined(_WIN64)
+#if defined(_WINDOWS)
 				PrevValue = (ULONG_PTR)InterlockedCompareExchangePointer(
 					(PVOID volatile * )(Reference),
 					(PVOID)(PrevCopy + 1),
@@ -191,10 +183,7 @@ namespace swutil
 			 ULONG_PTR volatile * Reference
 			)
 		{
-#ifdef _WIN64
-			return (InterlockedDecrement64(
-				(LONGLONG volatile *)Reference )) == 0;
-#elseif _WIN32
+#ifdef _WINDOWS
 			return (InterlockedDecrement(
 				(LONG volatile *)Reference )) == 0;
 #else
@@ -304,7 +293,7 @@ namespace swutil
 	{
 		LONG_PTR * SharedState;
 
-#if defined(_WIN32) && defined(_WIN64)
+#if defined(_WINDOWS)
 		SharedState = (LONG_PTR *) HeapAlloc(
 			GetProcessHeap( ),
 			0,
@@ -327,7 +316,7 @@ namespace swutil
 		 LONG_PTR * SharedState
 		)
 	{
-#if defined(_WIN32) && defined(_WIN64)
+#if defined(_WINDOWS)
 		HeapFree( GetProcessHeap( ), 0, SharedState );
 #else
         free(SharedState);

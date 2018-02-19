@@ -49,7 +49,7 @@ Environment:
 {
 	HANDLE File;
 
-#if defined(_WIN32) && defined(_WIN64)
+#if defined(_WINDOWS)
 	File = CreateFileA(
 		FileName.c_str( ),
 		GENERIC_READ,
@@ -166,7 +166,7 @@ Environment:
 	if (m_File != nullptr)
 	{
 
-#if defined(_WIN32) && defined(_WIN64)
+#if defined(_WINDOWS)
 		CloseHandle( m_File );
 #else
 		fclose(m_File);

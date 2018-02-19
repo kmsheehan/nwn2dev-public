@@ -13,11 +13,11 @@
 
 #endif
 
-#if defined(_WIN32) && defined(_WIN64)
+#if defined(_WINDOWS)
 
-#include <winsock2.h>
-#include <windows.h>
-#include <cguid.h>
+//#include <winsock2.h>
+//#include <windows.h>
+//#include <cguid.h>
 #include <atlbase.h>
 #ifndef SKIP_ATLENC
 #include <atlenc.h>

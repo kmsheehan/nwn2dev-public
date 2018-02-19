@@ -55,7 +55,7 @@ public:
 	{
 		if ((m_View != nullptr) && (!m_ExternalView))
 		{
-#if defined(_WIN32) && defined(_WIN64)
+#if defined(_WINDOWS)
 			UnmapViewOfFile( m_View );
 #else
             munmap(m_View,m_Size);
@@ -81,7 +81,7 @@ public:
 
 		if (m_View != nullptr)
 		{
-#if defined(_WIN32) && defined(_WIN64)
+#if defined(_WINDOWS)
 			UnmapViewOfFile( m_View );
 #else
 			munmap(m_View,m_Size);
@@ -95,7 +95,7 @@ public:
 			HANDLE Section;
 			unsigned char * View;
 
-#if defined(_WIN32) && defined(_WIN64)
+#if defined(_WINDOWS)
 			Section = CreateFileMapping(
 				m_File,
 				nullptr,
@@ -192,7 +192,7 @@ public:
 			return;
 		}
 
-#if defined(_WIN32) && defined(_WIN64)
+#if defined(_WINDOWS)
 		if (::ReadFile(
 			m_File,
 			Buffer,
@@ -250,7 +250,7 @@ public:
         Low  = (LONG) ((Offset >>  0) & 0xFFFFFFFF);
         High = (LONG) ((Offset >> 32) & 0xFFFFFFFF);
 
-#if defined(_WIN32) && defined(_WIN64)
+#if defined(_WINDOWS)
 
 		NewPtrLow = SetFilePointer( m_File, Low, &High, FILE_BEGIN );
 #else
@@ -280,7 +280,7 @@ public:
 		if (m_View != nullptr)
 			return m_Size;
 
-#if defined(_WIN32) && defined(_WIN64)
+#if defined(_WINDOWS)
 		Size = ::GetFileSize( m_File, &SizeHigh );
 
 		if ((Size == INVALID_FILE_SIZE) && (GetLastError( ) != NO_ERROR))
@@ -309,7 +309,7 @@ public:
 
 		Fp.QuadPart = 0;
 
-#if defined(_WIN32) && defined(_WIN64)
+#if defined(_WINDOWS)
 		if (!SetFilePointerEx( m_File, Fp, &Fp, FILE_CURRENT ))
 			throw std::runtime_error( "SetFilePointerEx failed" );
 
@@ -322,7 +322,7 @@ public:
 
 private:
 
-#if defined(_WIN32) && defined(_WIN64)
+#if defined(_WINDOWS)
 	DECLSPEC_NORETURN
 #endif
 	inline
@@ -341,7 +341,7 @@ private:
 		 size_t _Size
 		)
 	{
-#if defined(_WIN32) && defined(_WIN64)
+#if defined(_WINDOWS)
 		__try
 		{
 			return (memcpy( _Dst, _Src, _Size ));

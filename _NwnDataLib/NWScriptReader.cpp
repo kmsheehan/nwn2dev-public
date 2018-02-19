@@ -60,7 +60,7 @@ Environment:
 	// into our local storage.  The file is then closed.
 	//
 
-#if defined(_WIN32) && defined(_WIN64)
+#if defined(_WINDOWS)
 	File = CreateFileA(
 		NcsFileName,
 		GENERIC_READ,
@@ -140,7 +140,7 @@ Environment:
 	}
 	catch (...)
 	{
-#if defined(_WIN32) && defined(_WIN64)
+#if defined(_WINDOWS)
 		CloseHandle( File );
 #else
         fclose(File);
@@ -150,7 +150,7 @@ Environment:
 		throw;
 	}
 
-#if defined(_WIN32) && defined(_WIN64)
+#if defined(_WINDOWS)
 	CloseHandle( File );
 #else
     fclose(File);

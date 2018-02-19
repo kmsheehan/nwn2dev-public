@@ -1,6 +1,9 @@
 # CLion
 .idea
 
+# Visual Studio Files
+.vs
+
 # CMake - Make
 Makefile
 CMakeCache.txt

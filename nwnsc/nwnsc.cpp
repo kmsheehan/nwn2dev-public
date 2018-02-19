@@ -13,10 +13,13 @@ Abstract:
     control.
 
 --*/
+#ifdef _WINDOWS
+#include <time.h>
+#include <io.h>
+#define strtok_r strtok_s
+#endif
 
 #include <vector>
-#include <libgen.h>
-#include <unistd.h>
 #include <list>
 #include <fstream>
 #include <iostream>
@@ -27,6 +30,8 @@ Abstract:
 #include "../_NwnUtilLib/version.h"
 
 #if defined(__linux__)
+#include <libgen.h>
+#include <unistd.h>
 #include <stdarg.h>
 #endif
 
@@ -183,7 +188,7 @@ Environment:
 
     Status = RegOpenKeyEx(
         HKEY_LOCAL_MACHINE,
-        L"SOFTWARE\\BioWare\\NWN\\Neverwinter",
+        "SOFTWARE\\BioWare\\NWN\\Neverwinter",
         REG_OPTION_RESERVED,
 #ifdef _WIN64
         KEY_QUERY_VALUE | KEY_WOW64_32KEY,
@@ -202,8 +207,8 @@ Environment:
             bool                FoundIt;
             static const char * ValueNames[ ] =
             {
-                "Path",     // Retail NWN2
-                "Location", // Steam NWN2
+                "Path",     // Retail NWN
+                "Location", // Steam NWN
             };
 
             FoundIt = false;
@@ -397,7 +402,7 @@ Environment:
     FileWrapper FileWrap;
     HANDLE SrcFile;
 
-#if defined(_WIN32) && defined(_WIN64)
+#if defined(_WINDOWS)
 
 
     FileContents.clear( );
@@ -525,7 +530,7 @@ Environment:
     // First, canonicalize the filename.
     //
 
-#if defined(_WIN32) && defined(_WIN64)
+#if defined(_WINDOWS)
     char                   Drive[ _MAX_DRIVE ];
     char                   Dir[ _MAX_DIR ];
     char                   FileName[ _MAX_FNAME ];
@@ -561,7 +566,7 @@ Environment:
 
 #endif
 
-#if defined(_WIN32) && defined(_WIN64)
+#if defined(_WINDOWS)
     FileResType = ResMan.ExtToResType(Extension + 1);
 #else
     FileResType = ResMan.ExtToResType(Extension.c_str());
@@ -1199,7 +1204,7 @@ Environment:
 
     Errors = 0;
 
-#if defined(_WIN32) && defined(_WIN64)
+#if defined(_WINDOWS)
     char                   Drive[ _MAX_DRIVE ];
     char                   Dir[ _MAX_DIR ];
     char                   FileName[ _MAX_FNAME ];
@@ -1258,7 +1263,7 @@ Environment:
 
         MatchedFile = WildcardRoot;
 
-#if defined(_WIN32) && defined(_WIN64)
+#if defined(_WINDOWS)
         if (MatchedFile.back() != '\\')
             MatchedFile.push_back( '\\' );
 #else
@@ -1477,7 +1482,7 @@ Environment:
     UINT32 CompilerFlags = 0;
     ULONG StartTime;
 
-#if defined(_WIN32) && defined(_WIN64)
+#if defined(_WINDOWS)
     StartTime = GetTickCount( );
 #endif
     SearchPaths.push_back(".");
@@ -1519,7 +1524,7 @@ Environment:
                             if (BatchOutDir.empty())
                                 BatchOutDir = ".";
 
-#if defined(_WIN32) && defined(_WIN64)
+#if defined(_WINDOWS)
                             if (BatchOutDir.back() != '\\')
                                     BatchOutDir.push_back( '\\' );
 #else
@@ -1553,7 +1558,7 @@ Environment:
 
                             HomeDir = argv[i + 1];
 
-#if defined(_WIN32) && defined(_WIN64)
+#if defined(_WINDOWS)
                             if (HomeDir.back() != '\\')
                                     HomeDir.push_back( '\\' );
 #else
@@ -1607,7 +1612,7 @@ Environment:
 
                             InstallDir = argv[i + 1];
 
-#if defined(_WIN32) && defined(_WIN64)
+#if defined(_WINDOWS)
                             if (InstallDir.back() != '\\')
                                 InstallDir.push_back( '\\' );
 #else
@@ -1901,7 +1906,7 @@ Environment:
                     ThisOutFile.erase(Offs);
             } else {
 
-#if defined(_WIN32) && defined(_WIN64)
+#if defined(_WINDOWS)
                 char FileName[ _MAX_FNAME ];
 
                 if (_splitpath_s(
@@ -1964,7 +1969,7 @@ Environment:
         }
     }
 
-#if defined(_WIN32) && defined(_WIN64)
+#if defined(_WINDOWS)
     if (!Quiet)
     {
         g_TextOut.WriteText(

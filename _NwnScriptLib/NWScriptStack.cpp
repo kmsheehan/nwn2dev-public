@@ -3197,7 +3197,7 @@ Environment:
 	if (String >= m_StackStrings.size( ))
 		throw invalid_handle_exception( "illegal dynamic string stack handle" );
 
-#if defined(_WIN32) && defined(_WIN64)
+#if defined(_WINDOWS)
 	StringCbPrintfA(
 		Str,
 		sizeof( Str ),
@@ -3248,7 +3248,7 @@ Environment:
 	if (String >= m_StackStrings.size( ))
 		throw invalid_handle_exception( "illegal dynamic string stack handle" );
 
-#if defined(_WIN32) && defined(_WIN64)
+#if defined(_WINDOWS)
 	StringCbPrintfA(
 		Str,
 		sizeof( Str ),
@@ -3336,7 +3336,7 @@ Environment:
 	if (String >= m_StackStrings.size( ))
 		throw invalid_handle_exception( "illegal dynamic string stack handle" );
 
-#if defined(_WIN32) && defined(_WIN64)
+#if defined(_WINDOWS)
 	StringCbPrintfA(
 		Str,
 		sizeof( Str ),
@@ -3495,7 +3495,7 @@ Environment:
 	if (m_StackStrings[ String ].empty( ))
 		return m_InvalidObjId;
 
-#if defined(_WIN32) && defined(_WIN64)
+#if defined(_WINDOWS)
 	ObjectId = (NWN::OBJECTID) _strtoui64(
 		m_StackStrings[ String ].c_str( ),
 		&Endp,
