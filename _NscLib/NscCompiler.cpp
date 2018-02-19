@@ -519,7 +519,7 @@ const char *NscGetActionName (int nAction, NscCompiler *pCompiler)
 //	g_pCtx->yyerror(s);
 //}
 //#else
-void yy::parser::error (const yy::parser::location_type& l,
+void yy::parser::error (const location_type& l,
 			const std::string& m) {
     context.yyerror(m.c_str());
 }
