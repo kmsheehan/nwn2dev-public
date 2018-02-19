@@ -337,7 +337,11 @@ Environment:
     LoadParams.ResManFlags |= ResourceManager::ResManFlagErf16;
 
     if (Compilerversion >= 174) {
-        KeyFiles.push_back("data/nwn_base");
+#ifdef _WINDOWS
+		KeyFiles.push_back("data\\nwn_base");
+#else
+		KeyFiles.push_back("data/nwn_base");
+#endif // _WINDOWS
     } else {
         KeyFiles.push_back("xp3");
         KeyFiles.push_back("xp2patch");
