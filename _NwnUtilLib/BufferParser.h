@@ -8,6 +8,7 @@
 #elif(__linux__)
 #include <unistd.h>
 #include <string.h>
+#include <cstddef>
 #endif
 
 namespace swutil

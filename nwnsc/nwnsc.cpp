@@ -1754,11 +1754,6 @@ Environment:
     } while (!Error);
 
 
-//	if (!Quiet)
-//	{
-
-//	}
-
     if ((Version) || (Error) || (InFiles.empty())) {
         printf(
                 "\nUsage:\n"
