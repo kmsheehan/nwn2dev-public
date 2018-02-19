@@ -1291,9 +1291,7 @@ Environment:
 	{
 		if (FindData.attrib & _A_SUBDIR)
 			continue;
-
-        TextOut->WriteText("--- InFile [%s]\n", FindData.name);
-
+        
 		MatchedFile  = WildcardRoot;
 
 #if defined(_WIN32) && defined(_WIN64)
@@ -1315,8 +1313,6 @@ Environment:
 			OutFile  = BatchOutDir;
 			OutFile += FindData.name;
 		}
-
-        TextOut->WriteText("--- OutFile [%s]\n", OutFile.c_str());
 
 		Offs = OutFile.find_last_of( '.' );
 
