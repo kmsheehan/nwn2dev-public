@@ -298,14 +298,11 @@ LoadScriptResources(
 
 Routine Description:
 
-	This routine loads a module into the resource system.
+	This routine loads the game script data into the resource system.
 
 Arguments:
 
 	ResMan - Supplies the ResourceManager instance that is to load the module.
-
-	ModuleName - Supplies the resource name of the module to load.  If an
-	             empty string is supplied, only base game resources are loaded.
 
 	NWNHome - Supplies the users NWN2 home directory (i.e. NWN2 Documents dir).
 
@@ -453,10 +450,10 @@ Environment:
 
     SrcFile = fopen(FileName.c_str(),"r");
 
-    FileContents.clear( );
-
-    if (SrcFile == nullptr)
+    if (SrcFile == NULL)
         return false;
+
+    FileContents.clear( );
 
     try {
         FileWrap.SetFileHandle(SrcFile,true);
@@ -583,10 +580,11 @@ Environment:
 	// system.
 	//
 
-    if (!access( InFile.c_str( ), 00 ))
-    {
+    if (!access( InFile.c_str( ), 00 )) {
 		return LoadFileFromDisk( InFile, FileContents );
-	}
+	} else {
+        return false;
+    }
 }
 
 bool
@@ -672,7 +670,7 @@ Environment:
 
     if (!Quiet)
 	{
-		TextOut->WriteText("Compiling: %s\n",InFile);
+		TextOut->WriteText("Compiling: %s.nss\n",InFile);
 	}
 
 	//
@@ -1069,8 +1067,9 @@ Environment:
 		FileResType,
 		InFileContents))
 	{
-		TextOut->WriteText(
-			"Error: Unable to read input file '%s'.\n", InFile.c_str() );
+        char fileStr[512];
+        snprintf(fileStr, sizeof(fileStr),"Error: Unable to read input file '%s'.\n",InFile.c_str());
+		TextOut->WriteText( fileStr );
 
 		return false;
 	}
@@ -1293,8 +1292,19 @@ Environment:
 		if (FindData.attrib & _A_SUBDIR)
 			continue;
 
+        TextOut->WriteText("--- InFile [%s]\n", FindData.name);
+
 		MatchedFile  = WildcardRoot;
-		MatchedFile += FindData.name;
+
+#if defined(_WIN32) && defined(_WIN64)
+        if (MatchedFile.back() != '\\')
+            MatchedFile.push_back( '\\' );
+#else
+        if (MatchedFile.back() != '/')
+            MatchedFile.push_back( '/' );
+#endif
+
+        MatchedFile += FindData.name;
 
 		if (BatchOutDir.empty( ))
 		{
@@ -1305,6 +1315,8 @@ Environment:
 			OutFile  = BatchOutDir;
 			OutFile += FindData.name;
 		}
+
+        TextOut->WriteText("--- OutFile [%s]\n", OutFile.c_str());
 
 		Offs = OutFile.find_last_of( '.' );
 
@@ -1347,7 +1359,7 @@ Environment:
 	_findclose( FindHandle );
 
 	if (Errors)
-		TextOut->WriteText( "%lu error(s); see above for context.\n", Errors );
+		TextOut->WriteText( "%d error(s); see above for context.\n", Errors );
 
 	return Status;
 }
@@ -1563,7 +1575,14 @@ Environment:
 							if (BatchOutDir.empty( ))
 								BatchOutDir = ".";
 
-							BatchOutDir.push_back( '/' );
+#if defined(_WIN32) && defined(_WIN64)
+                        if (BatchOutDir.back() != '\\')
+                                BatchOutDir.push_back( '\\' );
+#else
+                        if (BatchOutDir.back() != '/')
+                            BatchOutDir.push_back( '/' );
+#endif
+
 
 							i += 1;
 						}
@@ -1592,7 +1611,15 @@ Environment:
 
                             HomeDir = argv[ i + 1 ];
 
-							i += 1;
+#if defined(_WIN32) && defined(_WIN64)
+                        if (HomeDir.back() != '\\')
+                                HomeDir.push_back( '\\' );
+#else
+                            if (HomeDir.back() != '/')
+                                HomeDir.push_back( '/' );
+#endif
+
+                            i += 1;
 						}
 						break;
 
@@ -1643,12 +1670,13 @@ Environment:
 
                             InstallDir = argv[ i + 1 ];
 
-							if ((!InstallDir.empty( ))          &&
-							    (*InstallDir.rbegin( ) != '\\') &&
-							    (*InstallDir.rbegin( ) != '/'))
-							{
-								InstallDir.push_back( '/' );
-							}
+#if defined(_WIN32) && defined(_WIN64)
+                            if (InstallDir.back() != '\\')
+                                InstallDir.push_back( '\\' );
+#else
+                            if (InstallDir.back() != '/')
+                                InstallDir.push_back( '/' );
+#endif
 
 							i += 1;
 						}
@@ -2006,7 +2034,9 @@ Environment:
 					continue;
 				}
 #else
-                char *FileName = OsCompat::filename(it->c_str( ));
+                char filec[_MAX_FNAME];
+                strncpy(filec,it->c_str(),_MAX_FNAME);
+                char *FileName = OsCompat::filename(filec);
 #endif
 
 				ThisOutFile  = BatchOutDir;

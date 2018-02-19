@@ -895,7 +895,7 @@ void CNscContext::GenerateMessage (NscMessage nMessage, ...)
 			break;
 
 		case NscMessage_ErrorTooManyFunctionArgs:
-			GenerateError ("%sToo many arguments specified in call to \"%s\"",
+			GenerateError ("%sToo many arguments specified in call to \"%s\" ",
 				szPrefix, va_arg (marker, const char *));
 			break;
 
@@ -905,7 +905,7 @@ void CNscContext::GenerateMessage (NscMessage nMessage, ...)
 				const char *pszFnName = va_arg (marker, const char *);
 
 				GenerateError ("%sRequired argument \"%s\" missing in call to "
-					"\"%s\"", szPrefix, pszArgName, pszFnName);
+					"\"%s\" ", szPrefix, pszArgName, pszFnName);
 			}
 			break;
 
@@ -1063,7 +1063,7 @@ void CNscContext::GenerateMessage (NscMessage nMessage, ...)
 
 		case NscMessage_ErrorFunctionBodyMissing:
 			GenerateError ("%sFunction \"%s\" was referenced, but no function "
-				"body was supplied", szPrefix, va_arg (marker, const char *));
+				"body was supplied. ", szPrefix, va_arg (marker, const char *));
 			break;
 
 		case NscMessage_ErrorNotAllPathsReturnValue:
