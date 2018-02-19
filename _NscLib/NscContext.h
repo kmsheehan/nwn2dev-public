@@ -58,7 +58,7 @@
 #include "NwnArray.h"
 #include "NscPStackEntry.h"
 #include "NscSymbolTable.h"
-
+#define YYSTYPE CNscPStackEntry *
 #include "NscParser.hpp"
 
 #if defined(__linux__)

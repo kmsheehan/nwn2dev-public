@@ -41,6 +41,7 @@
 #include "Precomp.h"
 #include "Nsc.h"
 
+
 #pragma warning (disable : 4244 4102 4127)
 
 #ifndef __cplusplus
@@ -80,7 +81,7 @@ YYSTYPE NscBuildParameterList (YYSTYPE pList, YYSTYPE pParameter);
 YYSTYPE NscBuildParameter (YYSTYPE pType, YYSTYPE pId, YYSTYPE pInit);
 YYSTYPE NscBuildTranslation (YYSTYPE pList, YYSTYPE pTranslation);
 YYSTYPE NscBuildType (int nType, YYSTYPE pId);
-YYSTYPE NscBuild5Block (int nType, YYSTYPE pPrev, int nAddFence, YYSTYPE pInit, 
+YYSTYPE NscBuild5Block (int nType, YYSTYPE pPrev, int nAddFence, YYSTYPE pInit,
 	YYSTYPE pCond, YYSTYPE pInc, YYSTYPE pTrue, YYSTYPE pFalse);
 YYSTYPE NscBuildBreakContinue (int nToken);
 YYSTYPE NscBuildReturn (YYSTYPE pReturn);
@@ -98,14 +99,14 @@ bool NscBuildSyntaxError (int nToken, YYSTYPE yylval);
 %token IDENTIFIER INTEGER_CONST FLOAT_CONST STRING_CONST
 
 %token ADDEQ SUBEQ MULEQ DIVEQ MODEQ XOREQ ANDEQ OREQ SL SR USR
-%token SLEQ SREQ USREQ EQ NOTEQ LTEQ GTEQ ANDAND OROR PLUSPLUS MINUSMINUS 
+%token SLEQ SREQ USREQ EQ NOTEQ LTEQ GTEQ ANDAND OROR PLUSPLUS MINUSMINUS
 
 %token FLOAT_TYPE INT_TYPE OBJECT_TYPE STRING_TYPE VOID_TYPE STRUCT_TYPE
 %token VECTOR_TYPE ENGINE_TYPE ACTION_TYPE
 
 %token OBJECT_SELF_CONST OBJECT_INVALID_CONST
 
-%token BREAK CASE CONTINUE DEFAULT DO ELSE 
+%token BREAK CASE CONTINUE DEFAULT DO ELSE
 %token FOR IF RETURN  SWITCH  WHILE NWCONST
 
 %start translation_unit
@@ -120,340 +121,340 @@ bool NscBuildSyntaxError (int nToken, YYSTYPE yylval);
 
 primary_expression:
 	IDENTIFIER
-		{ 
-			$$ = NscBuildIdentifier ($1); 
+		{
+			$$ = NscBuildIdentifier ($1);
 		}
-	| INTEGER_CONST 
-		{ 
-			$$ = $1; 
+	| INTEGER_CONST
+		{
+			$$ = $1;
 		}
-	| FLOAT_CONST 
-		{ 
-			$$ = $1; 
+	| FLOAT_CONST
+		{
+			$$ = $1;
 		}
 	| STRING_CONST
-		{ 
-			$$ = $1; 
+		{
+			$$ = $1;
 		}
 	| OBJECT_SELF_CONST
-		{ 
-			$$ = NscBuildObjectConstant (0); 
+		{
+			$$ = NscBuildObjectConstant (0);
 		}
 	| OBJECT_INVALID_CONST
-		{ 
-			$$ = NscBuildObjectConstant (1); 
+		{
+			$$ = NscBuildObjectConstant (1);
 		}
 	| '(' expression ')'
-		{ 
+		{
 			$$ = $2; }
 	| '[' ']'
-		{ 
+		{
 			$$ = NscBuildVectorConstant (NULL, NULL, NULL);
 		}
 	| '[' FLOAT_CONST ']'
-		{ 
-			$$ = NscBuildVectorConstant ($2, NULL, NULL); 
+		{
+			$$ = NscBuildVectorConstant ($2, NULL, NULL);
 		}
 	| '[' FLOAT_CONST ',' FLOAT_CONST ']'
-		{ 
-			$$ = NscBuildVectorConstant ($2, $4, NULL); 
+		{
+			$$ = NscBuildVectorConstant ($2, $4, NULL);
 		}
 	| '[' FLOAT_CONST ',' FLOAT_CONST ',' FLOAT_CONST ']'
-		{ 
-			$$ = NscBuildVectorConstant ($2, $4, $6); 
+		{
+			$$ = NscBuildVectorConstant ($2, $4, $6);
 		}
 	;
 
 postfix_expression:
-	primary_expression 
-		{ 
-			$$ = $1; 
+	primary_expression
+		{
+			$$ = $1;
 		}
 	| IDENTIFIER '(' argument_expression_list ')'
-		{ 
-			$$ = NscBuildCall ($1, $3); 
+		{
+			$$ = NscBuildCall ($1, $3);
 		}
 	| IDENTIFIER '(' ')'
-		{ 
-			$$ = NscBuildCall ($1, NULL); 
+		{
+			$$ = NscBuildCall ($1, NULL);
 		}
 	| postfix_expression '.' IDENTIFIER
-		{ 
-			$$ = NscBuildElementAccess ($1, $3); 
+		{
+			$$ = NscBuildElementAccess ($1, $3);
 		}
 	| postfix_expression PLUSPLUS
-		{ 
-			$$ = NscBuildPlusMinus ($1, 1, 0); 
+		{
+			$$ = NscBuildPlusMinus ($1, 1, 0);
 		}
 	| postfix_expression MINUSMINUS
-		{ 
+		{
 			$$ = NscBuildPlusMinus ($1, 0, 0);
 		}
 	;
 
 argument_expression_list:
 	assignment_expression
-		{ 
-			$$ = NscBuildArgExpList (NULL, $1); 
+		{
+			$$ = NscBuildArgExpList (NULL, $1);
 		}
 	| argument_expression_list ',' assignment_expression
-		{ 
-			$$ = NscBuildArgExpList ($1, $3); 
+		{
+			$$ = NscBuildArgExpList ($1, $3);
 		}
 	;
 
 unary_expression:
-	postfix_expression 
-		{ 
-			$$ = $1; 
+	postfix_expression
+		{
+			$$ = $1;
 		}
 	| PLUSPLUS unary_expression
-		{ 
-			$$ = NscBuildPlusMinus ($2, 1, 1); 
+		{
+			$$ = NscBuildPlusMinus ($2, 1, 1);
 		}
 	| MINUSMINUS unary_expression
-		{ 
-			$$ = NscBuildPlusMinus ($2, 0, 1); 
+		{
+			$$ = NscBuildPlusMinus ($2, 0, 1);
 		}
 	| '+' unary_expression
-		{ 
+		{
 			$$ = NscBuildUnaryOp ('+', $2);
 		}
 	| '-' unary_expression
-		{ 
-			$$ = NscBuildUnaryOp ('-', $2); 
+		{
+			$$ = NscBuildUnaryOp ('-', $2);
 		}
 	| '~' unary_expression
-		{ 
-			$$ = NscBuildUnaryOp ('~', $2); 
+		{
+			$$ = NscBuildUnaryOp ('~', $2);
 		}
 	| '!' unary_expression
-		{ 
-			$$ = NscBuildUnaryOp ('!', $2); 
+		{
+			$$ = NscBuildUnaryOp ('!', $2);
 		}
 	;
 
 multiplicative_expression:
-	unary_expression 
-		{ 
-			$$ = $1; 
+	unary_expression
+		{
+			$$ = $1;
 		}
 	| multiplicative_expression '*' unary_expression
-		{ 
-			$$ = NscBuildBinaryOp ('*', $1, $3); 
+		{
+			$$ = NscBuildBinaryOp ('*', $1, $3);
 		}
 	| multiplicative_expression '/' unary_expression
-		{ 
-			$$ = NscBuildBinaryOp ('/', $1, $3); 
+		{
+			$$ = NscBuildBinaryOp ('/', $1, $3);
 		}
 	| multiplicative_expression '%' unary_expression
-		{ 
-			$$ = NscBuildBinaryOp ('%', $1, $3); 
+		{
+			$$ = NscBuildBinaryOp ('%', $1, $3);
 		}
 	;
 
 additive_expression:
-	multiplicative_expression 
-		{ 
-			$$ = $1; 
+	multiplicative_expression
+		{
+			$$ = $1;
 		}
 	| additive_expression '+' multiplicative_expression
-		{ 
-			$$ = NscBuildBinaryOp ('+', $1, $3); 
+		{
+			$$ = NscBuildBinaryOp ('+', $1, $3);
 		}
 	| additive_expression '-' multiplicative_expression
-		{ 
-			$$ = NscBuildBinaryOp ('-', $1, $3); 
+		{
+			$$ = NscBuildBinaryOp ('-', $1, $3);
 		}
 	;
 
 shift_expression:
-	additive_expression 
-		{ 
-			$$ = $1; 
+	additive_expression
+		{
+			$$ = $1;
 		}
 	| shift_expression SL additive_expression
-		{ 
+		{
 			$$ = NscBuildBinaryOp (token::SL, $1, $3);
 		}
 	| shift_expression SR additive_expression
-		{ 
+		{
 			$$ = NscBuildBinaryOp (token::SR, $1, $3);
 		}
 	| shift_expression USR additive_expression
-		{ 
+		{
 			$$ = NscBuildBinaryOp (token::USR, $1, $3);
 		}
 	;
 
 relational_expression:
-	shift_expression 
-		{ 
-			$$ = $1; 
+	shift_expression
+		{
+			$$ = $1;
 		}
 	| relational_expression '<' shift_expression
-		{ 
-			$$ = NscBuildBinaryOp ('<', $1, $3); 
+		{
+			$$ = NscBuildBinaryOp ('<', $1, $3);
 		}
 	| relational_expression '>' shift_expression
-		{ 
-			$$ = NscBuildBinaryOp ('>', $1, $3); 
+		{
+			$$ = NscBuildBinaryOp ('>', $1, $3);
 		}
 	| relational_expression LTEQ shift_expression
-		{ 
+		{
 			$$ = NscBuildBinaryOp (token::LTEQ, $1, $3);
 		}
 	| relational_expression GTEQ shift_expression
-		{ 
+		{
 			$$ = NscBuildBinaryOp (token::GTEQ, $1, $3);
 		}
 	;
 
 equality_expression:
-	relational_expression 
-		{ 
-			$$ = $1; 
+	relational_expression
+		{
+			$$ = $1;
 		}
 	| equality_expression EQ relational_expression
-		{ 
+		{
 			$$ = NscBuildBinaryOp (token::EQ, $1, $3);
 		}
 	| equality_expression NOTEQ relational_expression
-		{ 
+		{
 			$$ = NscBuildBinaryOp (token::NOTEQ, $1, $3);
 		}
 	;
 
 and_expression:
-	equality_expression 
-		{ 
-			$$ = $1; 
+	equality_expression
+		{
+			$$ = $1;
 		}
 	| and_expression '&' equality_expression
-		{ 
-			$$ = NscBuildBinaryOp ('&', $1, $3); 
+		{
+			$$ = NscBuildBinaryOp ('&', $1, $3);
 		}
 	;
 
 exclusive_or_expression:
-	and_expression 
-		{ 
-			$$ = $1; 
+	and_expression
+		{
+			$$ = $1;
 		}
 	| exclusive_or_expression '^' and_expression
-		{ 
-			$$ = NscBuildBinaryOp ('^', $1, $3); 
+		{
+			$$ = NscBuildBinaryOp ('^', $1, $3);
 		}
 	;
 
 inclusive_or_expression:
-	exclusive_or_expression 
-		{ 
-			$$ = $1; 
+	exclusive_or_expression
+		{
+			$$ = $1;
 		}
 	| inclusive_or_expression '|' exclusive_or_expression
-		{ 
-			$$ = NscBuildBinaryOp ('|', $1, $3); 
+		{
+			$$ = NscBuildBinaryOp ('|', $1, $3);
 		}
 	;
 
 logical_and_expression:
-	inclusive_or_expression 
-		{ 
-			$$ = $1; 
+	inclusive_or_expression
+		{
+			$$ = $1;
 		}
 	| logical_and_expression ANDAND inclusive_or_expression
-		{ 
+		{
 			$$ = NscBuildLogicalOp (token::ANDAND, $1, $3);
 		}
 	;
 
 logical_or_expression:
-	logical_and_expression 
-		{ 
-			$$ = $1; 
+	logical_and_expression
+		{
+			$$ = $1;
 		}
 	| logical_or_expression OROR logical_and_expression
-		{ 
+		{
 			$$ = NscBuildLogicalOp (token::OROR, $1, $3);
 		}
 	;
 
 conditional_expression:
-	logical_or_expression 
-		{ 
-			$$ = $1; 
+	logical_or_expression
+		{
+			$$ = $1;
 		}
 	| logical_or_expression '?' expression ':' conditional_expression
-		{ 
-			$$ = NscBuildConditional ($1, $3, $5); 
+		{
+			$$ = NscBuildConditional ($1, $3, $5);
 		}
 	;
 
 assignment_expression:
-	conditional_expression 
-		{ 
-			$$ = $1; 
+	conditional_expression
+		{
+			$$ = $1;
 		}
 	| unary_expression '=' assignment_expression
-		{ 
-			$$ = NscBuildBinaryOp ('=', $1, $3); 
+		{
+			$$ = NscBuildBinaryOp ('=', $1, $3);
 		}
 	| unary_expression MULEQ assignment_expression
-		{ 
+		{
 			$$ = NscBuildBinaryOp (token::MULEQ, $1, $3);
 		}
 	| unary_expression DIVEQ assignment_expression
-		{ 
+		{
 			$$ = NscBuildBinaryOp (token::DIVEQ, $1, $3);
 		}
 	| unary_expression MODEQ assignment_expression
-		{ 
+		{
 			$$ = NscBuildBinaryOp (token::MODEQ, $1, $3);
 		}
 	| unary_expression ADDEQ assignment_expression
-		{ 
+		{
 			$$ = NscBuildBinaryOp (token::ADDEQ, $1, $3);
 		}
 	| unary_expression SUBEQ assignment_expression
-		{ 
+		{
 			$$ = NscBuildBinaryOp (token::SUBEQ, $1, $3);
 		}
 	| unary_expression SLEQ assignment_expression
-		{ 
+		{
 			$$ = NscBuildBinaryOp (token::SLEQ, $1, $3);
 		}
 	| unary_expression SREQ assignment_expression
-		{ 
+		{
 			$$ = NscBuildBinaryOp (token::SREQ, $1, $3);
 		}
 	| unary_expression USREQ assignment_expression
-		{ 
+		{
 			$$ = NscBuildBinaryOp (token::USREQ, $1, $3);
 		}
 	| unary_expression ANDEQ assignment_expression
-		{ 
+		{
 			$$ = NscBuildBinaryOp (token::ANDEQ, $1, $3);
 		}
 	| unary_expression XOREQ assignment_expression
-		{ 
+		{
 			$$ = NscBuildBinaryOp (token::XOREQ, $1, $3);
 		}
 	| unary_expression OREQ assignment_expression
-		{ 
+		{
 			$$ = NscBuildBinaryOp (token::OREQ, $1, $3);
 		}
 	;
 
 expression:
-	assignment_expression 
+	assignment_expression
 		{
-			$$ = NscBuildExpression (NULL, $1); 
+			$$ = NscBuildExpression (NULL, $1);
 		}
 	;
 
 constant_expression:
-	conditional_expression 
+	conditional_expression
 		{
 			$$ = $1;
 		}
@@ -466,61 +467,61 @@ constant_expression:
 */
 
 qualified_type_specifier:
-	NWCONST { NscBuildSaveLine (1); } type_specifier 
-		{ 
-			$$ = NscBuildMakeConstType ($3); 
-			NscBuildCopyLine (0, 1); 
-		}
-	| type_specifier 
+	NWCONST { NscBuildSaveLine (1); } type_specifier
 		{
-			$$ = $1; 
-			NscBuildSaveLine (0); 
+			$$ = NscBuildMakeConstType ($3);
+			NscBuildCopyLine (0, 1);
+		}
+	| type_specifier
+		{
+			$$ = $1;
+			NscBuildSaveLine (0);
 		}
 	;
 
 type_specifier:
-	VOID_TYPE 
+	VOID_TYPE
 		{
 			$$ = NscBuildType (token::VOID_TYPE, NULL);
 		}
-	| INT_TYPE 
+	| INT_TYPE
 		{
 			$$ = NscBuildType (token::INT_TYPE, NULL);
 		}
-	| FLOAT_TYPE 
+	| FLOAT_TYPE
 		{
 			$$ = NscBuildType (token::FLOAT_TYPE, NULL);
 		}
-	| OBJECT_TYPE 
-		{ 
+	| OBJECT_TYPE
+		{
 			$$ = NscBuildType (token::OBJECT_TYPE, NULL);
 		}
-	| STRING_TYPE 
-		{ 
+	| STRING_TYPE
+		{
 			$$ = NscBuildType (token::STRING_TYPE, NULL);
 		}
-	| ACTION_TYPE 
-		{ 
+	| ACTION_TYPE
+		{
 			$$ = NscBuildType (token::ACTION_TYPE, NULL);
 		}
-	| VECTOR_TYPE 
-		{ 
+	| VECTOR_TYPE
+		{
 			$$ = NscBuildType (token::VECTOR_TYPE, NULL);
 		}
-	| struct_type_start IDENTIFIER 
-		{ 
+	| struct_type_start IDENTIFIER
+		{
 			$$ = NscBuildType (token::STRUCT_TYPE, $2);
 		}
-	| ENGINE_TYPE 
+	| ENGINE_TYPE
 		{
 			$$ = NscBuildType (token::ENGINE_TYPE, $1);
 		}
 	;
-	
+
 struct_type_start:
-	STRUCT_TYPE 
-		{ 
-			NscBuildSaveLine (0); 
+	STRUCT_TYPE
+		{
+			NscBuildSaveLine (0);
 		}
 	;
 
@@ -531,60 +532,60 @@ struct_type_start:
 */
 
 statement:
-	non_blank_statement 
-		{ 
-			$$ = $1; 
+	non_blank_statement
+		{
+			$$ = $1;
 		}
-	| ';' 
-		{ 
-			NscBuildSaveLine (0); 
-			$$ = NscBuildMarkLine (0, NscBuildStatement (NULL, NULL, NULL)); 
+	| ';'
+		{
+			NscBuildSaveLine (0);
+			$$ = NscBuildMarkLine (0, NscBuildStatement (NULL, NULL, NULL));
 		}
 	;
-	
+
 statement_blank_error:
-	non_blank_statement 
+	non_blank_statement
 		{
-			$$ = $1; 
+			$$ = $1;
 		}
-	| ';' 
+	| ';'
 		{
-			NscBuildSaveLine (0); 
-			$$ = NscBuildMarkLine (0, NscBuildBlankStatement ()); 
+			NscBuildSaveLine (0);
+			$$ = NscBuildMarkLine (0, NscBuildBlankStatement ());
 		}
 	;
 
 non_blank_statement:
-	labeled_statement      
-		{
-			$$ = NscBuildStatement (NULL, $1, NULL); 
-		}
-	| compound_statement   
-		{
-			$$ = NscBuildStatement (NULL, $1, NULL); 
-		}
-	| expression_statement 
-		{
-			$$ = NscBuildMarkLine (0, NscBuildStatement (NULL, $1, NULL));
-		}
-	| selection_statement  
+	labeled_statement
 		{
 			$$ = NscBuildStatement (NULL, $1, NULL);
 		}
-	| iteration_statement  
+	| compound_statement
 		{
 			$$ = NscBuildStatement (NULL, $1, NULL);
 		}
-	| jump_statement       
+	| expression_statement
 		{
 			$$ = NscBuildMarkLine (0, NscBuildStatement (NULL, $1, NULL));
 		}
-	| declaration          
+	| selection_statement
 		{
-			$$ = NscBuildMarkLine (0, NscBuildStatement (NULL, $1, NULL)); 
+			$$ = NscBuildStatement (NULL, $1, NULL);
+		}
+	| iteration_statement
+		{
+			$$ = NscBuildStatement (NULL, $1, NULL);
+		}
+	| jump_statement
+		{
+			$$ = NscBuildMarkLine (0, NscBuildStatement (NULL, $1, NULL));
+		}
+	| declaration
+		{
+			$$ = NscBuildMarkLine (0, NscBuildStatement (NULL, $1, NULL));
 		}
 	;
-	
+
 /*
 **
 ** Labeled statements (case, default)
@@ -592,23 +593,23 @@ non_blank_statement:
 */
 
 labeled_statement:
-	case_statement 
+	case_statement
 		{
-			$$ = $1; 
+			$$ = $1;
 		}
 	;
-	
+
 case_statement:
-	CASE { NscBuildSaveLine (0); } constant_expression ':' 
-		{ 
+	CASE { NscBuildSaveLine (0); } constant_expression ':'
+		{
 			$$ = NscBuildCase (token::CASE, $3);
 		}
-	| DEFAULT { NscBuildSaveLine (0); } ':' 
+	| DEFAULT { NscBuildSaveLine (0); } ':'
 		{
 			$$ = NscBuildCase (token::DEFAULT, NULL);
 		}
 	;
-	
+
 /*
 **
 ** Compound statement ({})
@@ -616,31 +617,31 @@ case_statement:
 */
 
 compound_statement:
-	compound_statement_start '}' 
+	compound_statement_start '}'
 		{
-			$$ = NscBuildStatement (NULL, NULL, $1); 
+			$$ = NscBuildStatement (NULL, NULL, $1);
 		}
-	| compound_statement_start statement_list '}' 
+	| compound_statement_start statement_list '}'
 		{
-			$$ = NscBuildStatement (NULL, $2, $1); 
+			$$ = NscBuildStatement (NULL, $2, $1);
 		}
 	;
-	
+
 compound_statement_start:
-	'{' 
+	'{'
 		{
-			$$ = NscBuildStatementFence (); 
+			$$ = NscBuildStatementFence ();
 		}
 	;
 
 statement_list:
-	statement 
+	statement
 		{
-			$$ = NscBuildStatement (NULL, $1, NULL); 
+			$$ = NscBuildStatement (NULL, $1, NULL);
 		}
-	| statement_list statement  
-		{ 
-			$$ = NscBuildStatement ($1, $2, NULL); 
+	| statement_list statement
+		{
+			$$ = NscBuildStatement ($1, $2, NULL);
 		}
 	;
 
@@ -651,27 +652,27 @@ statement_list:
 */
 
 expression_statement:
-	{ NscBuildSaveLine (0); } expression ';' 
+	{ NscBuildSaveLine (0); } expression ';'
 		{
-			$$ = NscBuildStatement (NULL, $2, NULL); 
+			$$ = NscBuildStatement (NULL, $2, NULL);
 		}
-	| error 
+	| error
 		{
 			$$ = NULL;
-			if (NscBuildSyntaxError (YYCHAR_NAME, yylval))
+			if (NscBuildSyntaxError (YYCHAR_NAME, YYLVAL))
 				YYABORT;
 			while (YYCHAR_NAME != EOF && YYCHAR_NAME != ';' && YYCHAR_NAME != '{' && YYCHAR_NAME != '}')
 			{
-				if (yylval != NULL)
-					yylval; //FIXME
-				YYCHAR_NAME = yyempty_;
-				YYCHAR_NAME = yylex (&yylval, context);
+				if (YYLVAL != NULL)
+					YYLVAL; //FIXME
+				YYCHAR_NAME = YYEMPTY;
+				YYCHAR_NAME = yylex (&YYLVAL, context);
 			}
 			if (YYCHAR_NAME == ';')
-				YYCHAR_NAME = yyempty_;
-		} 	
+				YYCHAR_NAME = YYEMPTY;
+		}
 	;
-	
+
 /*
 **
 ** If/Switch statement
@@ -680,41 +681,41 @@ expression_statement:
 
 selection_statement:
 	if_start statement_blank_error
-		{ 
-			$$ = NscBuild5Block (IF, $1, 0, NULL, NULL, NULL, $2, NULL); 
+		{
+			$$ = NscBuild5Block (IF, $1, 0, NULL, NULL, NULL, $2, NULL);
 		}
-	| if_else_start statement_blank_error 
+	| if_else_start statement_blank_error
 		{
 			$$ = NscBuild5Block (IF, $1, 0, NULL, NULL, NULL, NULL, $2);
 		}
-	| switch_start statement 
+	| switch_start statement
 		{
-			$$ = NscBuild5Block (SWITCH, $1, 0, NULL, NULL, NULL, $2, NULL); 
+			$$ = NscBuild5Block (SWITCH, $1, 0, NULL, NULL, NULL, $2, NULL);
 		}
 	;
-	
+
 if_else_start:
-	if_start statement_blank_error ELSE 
+	if_start statement_blank_error ELSE
 		{
-			NscBuildSaveLine (0); 
-			$$ = NscBuild5Block (IF, $1, 1, NULL, NULL, NULL, $2, NULL); 
+			NscBuildSaveLine (0);
+			$$ = NscBuild5Block (IF, $1, 1, NULL, NULL, NULL, $2, NULL);
 		}
 	;
-		
+
 if_start:
-	IF '(' { NscBuildSaveLine (0); } expression ')' 
-		{ 
-			$$ = NscBuild5Block (IF, NULL, 1, NULL, $4, NULL, NULL, NULL); 
-		}
-	;
-	
-switch_start:
-	SWITCH { NscBuildSaveLine (0); } '(' expression ')' 
+	IF '(' { NscBuildSaveLine (0); } expression ')'
 		{
-			$$ = NscBuild5Block (SWITCH, NULL, 1, NULL, $4, NULL, NULL, NULL); 
+			$$ = NscBuild5Block (IF, NULL, 1, NULL, $4, NULL, NULL, NULL);
 		}
 	;
-	
+
+switch_start:
+	SWITCH { NscBuildSaveLine (0); } '(' expression ')'
+		{
+			$$ = NscBuild5Block (SWITCH, NULL, 1, NULL, $4, NULL, NULL, NULL);
+		}
+	;
+
 /*
 **
 ** Iteration statement (while/do/if)
@@ -722,76 +723,76 @@ switch_start:
 */
 
 iteration_statement:
-	while_start statement 
+	while_start statement
 		{
-			$$ = NscBuild5Block (WHILE, $1, 0, NULL, NULL, NULL, $2, NULL); 
+			$$ = NscBuild5Block (WHILE, $1, 0, NULL, NULL, NULL, $2, NULL);
 		}
-	| do_start statement WHILE { NscBuildSaveLine (0); } '(' expression ')' ';' 
+	| do_start statement WHILE { NscBuildSaveLine (0); } '(' expression ')' ';'
 		{
-			$$ = NscBuild5Block (DO, $1, 0, NULL, $6, NULL, $2, NULL); 
+			$$ = NscBuild5Block (DO, $1, 0, NULL, $6, NULL, $2, NULL);
 		}
-	| for_start statement 
+	| for_start statement
 		{
-			$$ = NscBuild5Block (FOR, $1, 0, NULL, NULL, NULL, $2, NULL); 
+			$$ = NscBuild5Block (FOR, $1, 0, NULL, NULL, NULL, $2, NULL);
 		}
 	;
-	
+
 for_start:
-	for_start_start ';' ';' ')' 
+	for_start_start ';' ';' ')'
 		{
-			$$ = NscBuild5Block (FOR, NULL, 1, NULL, NULL, NULL, NULL, NULL); 
+			$$ = NscBuild5Block (FOR, NULL, 1, NULL, NULL, NULL, NULL, NULL);
 		}
-	| for_start_start expression ';' ';' ')' 
-		{ 
-			$$ = NscBuild5Block (FOR, NULL, 1, $2, NULL, NULL, NULL, NULL); 
+	| for_start_start expression ';' ';' ')'
+		{
+			$$ = NscBuild5Block (FOR, NULL, 1, $2, NULL, NULL, NULL, NULL);
 		}
 	| for_start_start ';' expression ';' ')'
-		{ 
+		{
 			$$ = NscBuild5Block (FOR, NULL, 1, NULL, $3, NULL, NULL, NULL);
 		}
-	| for_start_start expression ';' expression ';' ')' 
+	| for_start_start expression ';' expression ';' ')'
 		{
-			$$ = NscBuild5Block (FOR, NULL, 1, $2, $4, NULL, NULL, NULL); 
+			$$ = NscBuild5Block (FOR, NULL, 1, $2, $4, NULL, NULL, NULL);
 		}
-	| for_start_start ';' ';' expression ')' 
+	| for_start_start ';' ';' expression ')'
 		{
-			$$ = NscBuild5Block (FOR, NULL, 1, NULL, NULL, $4, NULL, NULL); 
+			$$ = NscBuild5Block (FOR, NULL, 1, NULL, NULL, $4, NULL, NULL);
 		}
-	| for_start_start expression ';' ';' expression ')' 
+	| for_start_start expression ';' ';' expression ')'
 		{
-			$$ = NscBuild5Block (FOR, NULL, 1, $2, NULL, $5, NULL, NULL); 
+			$$ = NscBuild5Block (FOR, NULL, 1, $2, NULL, $5, NULL, NULL);
 		}
-	| for_start_start ';' expression ';' expression ')' 
+	| for_start_start ';' expression ';' expression ')'
 		{
-			$$ = NscBuild5Block (FOR, NULL, 1, NULL, $3, $5, NULL, NULL); 
+			$$ = NscBuild5Block (FOR, NULL, 1, NULL, $3, $5, NULL, NULL);
 		}
-	| for_start_start expression ';' expression ';' expression ')' 
+	| for_start_start expression ';' expression ';' expression ')'
 		{
-			$$ = NscBuild5Block (FOR, NULL, 1, $2, $4, $6, NULL, NULL); 
+			$$ = NscBuild5Block (FOR, NULL, 1, $2, $4, $6, NULL, NULL);
 		}
 	;
-	
+
 for_start_start:
 	FOR '('
 		{
-			NscBuildSaveLine (0); 
+			NscBuildSaveLine (0);
 		}
 	;
-	
+
 while_start:
-	WHILE '(' { NscBuildSaveLine (0); } expression ')' 
-		{ 
-			$$ = NscBuild5Block (WHILE, NULL, 1, NULL, $4, NULL, NULL, NULL); 
+	WHILE '(' { NscBuildSaveLine (0); } expression ')'
+		{
+			$$ = NscBuild5Block (WHILE, NULL, 1, NULL, $4, NULL, NULL, NULL);
 		}
 	;
-	
+
 do_start:
-	DO 
-		{ 
-			$$ = NscBuild5Block (DO, NULL, 1, NULL, NULL, NULL, NULL, NULL); 
+	DO
+		{
+			$$ = NscBuild5Block (DO, NULL, 1, NULL, NULL, NULL, NULL, NULL);
 		}
 	;
-		
+
 /*
 **
 ** Jump statements (continue/break/return)
@@ -803,24 +804,24 @@ jump_statement:
 		{
 			$$ = NscBuildBreakContinue (CONTINUE);
 		}
-	| BREAK { NscBuildSaveLine (0); } ';' 
+	| BREAK { NscBuildSaveLine (0); } ';'
 		{
-			$$ = NscBuildBreakContinue (BREAK); 
+			$$ = NscBuildBreakContinue (BREAK);
 		}
-	| return_start ';' 
+	| return_start ';'
 		{
-			$$ = NscBuildReturn (NULL); 
+			$$ = NscBuildReturn (NULL);
 		}
-	| return_start expression ';' 
+	| return_start expression ';'
 		{
-			$$ = NscBuildReturn ($2); 
+			$$ = NscBuildReturn ($2);
 		}
 	;
 
 return_start:
-	RETURN 
-		{ 
-			NscBuildSaveLine (0); 
+	RETURN
+		{
+			NscBuildSaveLine (0);
 		}
 	;
 
@@ -831,41 +832,41 @@ return_start:
 */
 
 declaration:
-	qualified_type_specifier init_declarator_list ';' 
+	qualified_type_specifier init_declarator_list ';'
 		{
-			$$ = NscBuildDeclaration ($1, $2); 
+			$$ = NscBuildDeclaration ($1, $2);
 		}
 	;
-	
+
 init_declarator_list:
-	init_declarator 
+	init_declarator
 		{
-			$$ = NscBuildDeclarationList (NULL, $1); 
+			$$ = NscBuildDeclarationList (NULL, $1);
 		}
-	| init_declarator_list ',' init_declarator 
+	| init_declarator_list ',' init_declarator
 		{
-			$$ = NscBuildDeclarationList ($1, $3); 
+			$$ = NscBuildDeclarationList ($1, $3);
 		}
 	;
 
 init_declarator:
-	init_declarator_identifier 
+	init_declarator_identifier
 		{
 			$$ = NscBuildEndDeclaration ($1, NULL);
 		}
-	| init_declarator_identifier '=' assignment_expression 
+	| init_declarator_identifier '=' assignment_expression
 		{
 			$$ = NscBuildEndDeclaration ($1, $3);
 		}
 	;
 
 init_declarator_identifier:
-	IDENTIFIER 
+	IDENTIFIER
 		{
 			$$ = NscBuildBeginDeclaration ($1);
 		}
 	;
-	
+
 /*
 **
 ** Function definition
@@ -873,7 +874,7 @@ init_declarator_identifier:
 */
 
 function_definition:
-	function_declarator compound_statement 
+	function_declarator compound_statement
 		{
 			$$ = NscBuildFunctionDef ($1, $2);
 		}
@@ -882,18 +883,18 @@ function_definition:
 function_prototype:
 	function_declarator ';'
 		{
-			$$ = NscBuildFunctionPrototype ($1); 
+			$$ = NscBuildFunctionPrototype ($1);
 		}
 	;
 
 function_declarator:
-	qualified_type_specifier IDENTIFIER '(' function_parameter_type_list ')' 
+	qualified_type_specifier IDENTIFIER '(' function_parameter_type_list ')'
 		{
 			$$ = NscBuildFunctionDeclarator ($1, $2, $4);
 		}
-	| qualified_type_specifier IDENTIFIER '(' ')' 
+	| qualified_type_specifier IDENTIFIER '(' ')'
 		{
-			$$ = NscBuildFunctionDeclarator ($1, $2, NULL); 
+			$$ = NscBuildFunctionDeclarator ($1, $2, NULL);
 		}
 	;
 
@@ -903,24 +904,24 @@ function_parameter_type_list:
 	;
 
 function_parameter_list:
-	function_parameter_declaration 
+	function_parameter_declaration
 		{
 			$$ = NscBuildParameterList (NULL, $1);
 		}
-	| function_parameter_list ',' function_parameter_declaration 
+	| function_parameter_list ',' function_parameter_declaration
 		{
 			$$ = NscBuildParameterList ($1, $3);
 		}
 	;
 
 function_parameter_declaration:
-	qualified_type_specifier IDENTIFIER 
+	qualified_type_specifier IDENTIFIER
 		{
 			$$ = NscBuildParameter ($1, $2, NULL);
 		}
-	| qualified_type_specifier IDENTIFIER '=' assignment_expression 
+	| qualified_type_specifier IDENTIFIER '=' assignment_expression
 		{
-			$$ = NscBuildParameter ($1, $2, $4); 
+			$$ = NscBuildParameter ($1, $2, $4);
 		}
 	;
 
@@ -931,38 +932,38 @@ function_parameter_declaration:
 */
 
 struct_definition:
-	struct_type_start IDENTIFIER '{' struct_declaration_list '}' ';' 
+	struct_type_start IDENTIFIER '{' struct_declaration_list '}' ';'
 		{
 			$$ = NscBuildStruct ($2, $4);
 		}
 	;
 
 struct_declaration_list:
-	struct_declaration 
+	struct_declaration
 		{
 			$$ = NscBuildStructDeclarationList (NULL, $1);
 		}
-	| struct_declaration_list struct_declaration 
+	| struct_declaration_list struct_declaration
 		{
-			$$ = NscBuildStructDeclarationList ($1, $2); 
+			$$ = NscBuildStructDeclarationList ($1, $2);
 		}
 	;
 
 struct_declaration:
-	qualified_type_specifier struct_declarator_list ';' 
+	qualified_type_specifier struct_declarator_list ';'
 		{
-			$$ = NscBuildStructDeclaration ($1, $2); 
+			$$ = NscBuildStructDeclaration ($1, $2);
 		}
 	;
 
 struct_declarator_list:
 	IDENTIFIER
 		{
-			$$ = NscBuildStructDeclaratorList (NULL, $1); 
+			$$ = NscBuildStructDeclaratorList (NULL, $1);
 		}
-	| struct_declarator_list ',' IDENTIFIER 
+	| struct_declarator_list ',' IDENTIFIER
 		{
-			$$ = NscBuildStructDeclaratorList ($1, $3); 
+			$$ = NscBuildStructDeclaratorList ($1, $3);
 		}
 	;
 
@@ -974,27 +975,27 @@ struct_declarator_list:
 
 translation_unit:
 	/* EMPTY */
-	| external_declaration 
+	| external_declaration
 		{
 			$$ = NscBuildTranslation (NULL, $1);
 		}
-	| translation_unit external_declaration 
+	| translation_unit external_declaration
 		{
 			$$ = NscBuildTranslation ($1, $2);
 		}
-	| error 
+	| error
 		{
 			$$ = NULL;
-			if (NscBuildSyntaxError (YYCHAR_NAME, yylval))
+			if (NscBuildSyntaxError (YYCHAR_NAME, YYLVAL))
 				YYABORT;
 			while (YYCHAR_NAME != EOF && YYCHAR_NAME != ';' && YYCHAR_NAME != '{' && YYCHAR_NAME != '}')
 			{
-				if (yylval != NULL)
-					yylval; //FIXME
-				YYCHAR_NAME = yyempty_;
-				YYCHAR_NAME = yylex (&yylval, context);
+				if (YYLVAL != NULL)
+					YYLVAL; //FIXME
+				YYCHAR_NAME = YYEMPTY;
+				YYCHAR_NAME = yylex (&YYLVAL, context);
 			}
-			YYCHAR_NAME = yyempty_;
+			YYCHAR_NAME = YYEMPTY;
 		} 	
 	;
 

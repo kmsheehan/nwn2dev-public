@@ -5,7 +5,7 @@
    the NWN_BISON_3 macro is defined by the CMakeLists.txt
    based on the version of bison found
 */
-
+#     define YYEMPTY		(-2)
 #ifdef NWN_BISON_3
 #   define YYLVAL yyla.value
 #   define YYCHAR_NAME yyla.type
@@ -14,10 +14,8 @@
 #   define YYLVAL yylval
 #endif
 
-#define YYSTYPE void *
 
-
-enum {
+enum nwtoken {
     IDENTIFIER = 258,
     INTEGER_CONST = 259,
     FLOAT_CONST = 260,
