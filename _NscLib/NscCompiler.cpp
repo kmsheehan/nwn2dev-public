@@ -1235,8 +1235,11 @@ NscCompiler::LoadResource (
 		  ++it)
 	{
 		std::string Str (*it);
-
+#ifdef _WINDOWS
+		Str += "\\";
+#else
 		Str += "/";
+#endif
 		Str += pszName;
 		Str += ".";
 		Str += m_ResourceManager .ResTypeToExt (nResType);
@@ -1249,7 +1252,7 @@ NscCompiler::LoadResource (
 
 			if ((m_ShowIncludes) && (m_ErrorOutput != NULL))
 			{
-				m_ErrorOutput ->WriteText ("ShowIncludes: Handled resource %s.%s from %s.\n",
+				printf ("ShowIncludes: Handled resource %s.%s from %s.\n",
 					pszName,
 					m_ResourceManager .ResTypeToExt (nResType),
 					it ->c_str ());
@@ -1323,7 +1326,7 @@ NscCompiler::LoadResource (
 
 		if ((m_ShowIncludes) && (m_ErrorOutput != NULL))
 		{
-			m_ErrorOutput ->WriteText ("ShowIncludes: Handled resource %s.%s from ResLoadFile.\n",
+			printf ("ShowIncludes: Handled resource %s.%s from ResLoadFile.\n",
 				pszName,
 				m_ResourceManager .ResTypeToExt (nResType));
 		}
@@ -1415,7 +1418,7 @@ NscCompiler::LoadResource (
 			std::string AccessorName;
 
 			m_ResourceManager .GetResourceAccessorName (Handle, AccessorName);
-			m_ErrorOutput ->WriteText ("ShowIncludes: Handled resource %s.%s from %s.\n",
+			printf ("ShowIncludes: Handled resource %s.%s from %s.\n",
 				pszName,
 				m_ResourceManager .ResTypeToExt (nResType),
 				AccessorName .c_str ());

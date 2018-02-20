@@ -108,8 +108,6 @@ Environment:
 		throw;
 	}
 
-	C_ASSERT( sizeof( BIF_HEADER ) == 5 * 4 );
-	C_ASSERT( sizeof( BIF_RESOURCE ) == 4 * 4 );
 #else
 	File = fopen(FileName.c_str(),"r");
 

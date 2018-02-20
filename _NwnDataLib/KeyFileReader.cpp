@@ -99,9 +99,6 @@ Environment:
 
 	CloseHandle( File );
 
-	C_ASSERT( sizeof( KEY_HEADER ) == 64 );
-	C_ASSERT( sizeof( KEY_FILE ) == 12 );
-	C_ASSERT( sizeof( KEY_RESOURCE ) == 6 + sizeof( ResRefT ) );
 #else
 
     File = fopen(FileName.c_str(),"r");

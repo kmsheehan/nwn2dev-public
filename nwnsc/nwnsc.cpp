@@ -1048,9 +1048,8 @@ Environment:
             FileResRef,
             FileResType,
             InFileContents)) {
-        char fileStr[512];
-        snprintf(fileStr, sizeof(fileStr), "Error: Unable to read input file '%s'.\n", InFile.c_str());
-        TextOut->WriteText(fileStr);
+
+        TextOut->WriteText("Error: Unable to read input file '%s'.\n", InFile.c_str());
 
         return false;
     }
@@ -1268,8 +1267,10 @@ Environment:
         MatchedFile = WildcardRoot;
 
 #if defined(_WINDOWS)
-        if (MatchedFile.back() != '\\')
-            MatchedFile.push_back( '\\' );
+		if (MatchedFile.length() > 0) {
+			if (MatchedFile.back() != '\\')
+				MatchedFile.push_back('\\');
+		}
 #else
         if (MatchedFile.back() != '/')
             MatchedFile.push_back('/');
@@ -1289,7 +1290,7 @@ Environment:
         if (Offs != std::string::npos)
             OutFile.erase(Offs);
 
-        ThisStatus = ProcessInputFile(
+		ThisStatus = ProcessInputFile(
                 ResMan,
                 Compiler,
                 Compile,
@@ -1475,7 +1476,7 @@ Environment:
     bool Quiet = false;
     int CompilerVersion = 174;
     bool Error = false;
-    bool LoadResources = true;
+    bool LoadResources = false;
     bool Erf16 = true;
     bool ResponseFile = false;
     int ReturnCode = 0;
@@ -1811,7 +1812,7 @@ Environment:
         g_ResMan = new ResourceManager(&g_TextOut);
     }
     catch (std::runtime_error &e) {
-        g_TextOut.WriteText(
+        printf(
                 "Failed to initialize resource manager: '%s'\n",
                 e.what());
 
@@ -1830,7 +1831,7 @@ Environment:
 
 //		if (!Quiet)
 //		{
-//            g_TextOut.WriteText("Loading base game resources...\n");
+//            printf("Loading base game resources...\n");
 //		}
 
         if (InstallDir.empty()) {
@@ -1924,7 +1925,7 @@ Environment:
                     nullptr,
                     0))
                 {
-                    g_TextOut.WriteText(
+                    printf(
                         "Error: Invalid path: \"%s\".\n",
                         it->c_str( ));
 
@@ -1967,7 +1968,7 @@ Environment:
             Errors += 1;
 
             if (Flags & NscDFlag_StopOnError) {
-                g_TextOut.WriteText("Processing aborted.\n");
+                printf("Processing aborted.\n");
                 break;
             }
         }
@@ -1976,14 +1977,14 @@ Environment:
 #if defined(_WINDOWS)
     if (!Quiet)
     {
-        g_TextOut.WriteText(
+        printf(
             "Total Execution time = %lums\n",
             GetTickCount( ) - StartTime);
     }
 #endif
 
     if (Errors > 1)
-        g_TextOut.WriteText("%lu error(s) processing input files.\n", Errors);
+        printf("%lu error(s) processing input files.\n", Errors);
 
     if (g_Log != nullptr) {
         fclose(g_Log);

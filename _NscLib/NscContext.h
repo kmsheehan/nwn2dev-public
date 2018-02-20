@@ -70,8 +70,6 @@
 #include <strsafe.h>
 #endif
 
-#define _NSCCONTEXT_USE_BISONPP 1
-
 //-----------------------------------------------------------------------------
 //
 // Forward definitions

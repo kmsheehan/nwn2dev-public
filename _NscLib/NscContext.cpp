@@ -192,17 +192,8 @@ CNscContext::~CNscContext ()
 
 int CNscContext::parse ()
 {
-#if _NSCCONTEXT_USE_BISONPP
-	yy::parser parser(*this);
-	return parser.parse();
-//	return Myyyparser (*this).yyparse();
-#else
     yy::parser parser(*this);
-#ifdef _DEBUG
-    parser.set_debug_level(true);
-#endif
     return parser.parse();
-#endif
 }
 
 //-----------------------------------------------------------------------------
