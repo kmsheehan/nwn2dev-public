@@ -30,9 +30,12 @@ Abstract:
 #include "../_NwnUtilLib/version.h"
 
 #if defined(__linux__)
-#include <libgen.h>
 #include <unistd.h>
 #include <stdarg.h>
+#endif
+
+#if defined(__linux__) || defined(__APPLE__)
+#include <libgen.h>
 #endif
 
 typedef std::vector<std::string> StringVec;
