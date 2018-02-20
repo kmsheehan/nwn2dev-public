@@ -310,7 +310,7 @@ NscResult NscCompileScript (CNwnLoader *pLoader, const char *pszName,
 	// continue to allow if the user requires compatibility.
 	//
 
-	if (nVersion <= 169)  // Note, the current (last) stock compiler has the bug
+	if (nVersion <= 174)  // Note, the current (last) stock compiler has the bug
 	{
 		sCtx .SetWarnAllowDefaultInitializedConstants (true);
 		sCtx .SetWarnAllowMismatchedPrototypes (true);
